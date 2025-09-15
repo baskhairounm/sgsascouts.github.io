@@ -24,10 +24,24 @@ let currentDate = new Date();
 // Initialize app
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, initializing app...');
+    
+    // Ensure all modals are hidden by default
+    hideAllModals();
+    
     initializeApp();
     setupEventListeners();
     setDefaultDate();
 });
+
+// Function to hide all modals
+function hideAllModals() {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        if (modal.id !== 'loginModal') {
+            modal.style.display = 'none';
+        }
+    });
+}
 
 // Initialize authentication state
 function initializeApp() {
