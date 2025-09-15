@@ -60,6 +60,69 @@
             </div>
         </section>
 
+        <section id="meeting-tracker" class="meeting-tracker">
+            <div class="container">
+                <h2>Meeting Information</h2>
+                <div class="tracker-grid">
+                    <div class="tracker-card next-meeting">
+                        <div class="tracker-icon">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div class="tracker-content">
+                            <h3>Next Meeting</h3>
+                            <p class="meeting-date" id="nextMeetingDate">Loading...</p>
+                            <p class="meeting-time">Tuesday 6:15 PM - 7:45 PM</p>
+                        </div>
+                    </div>
+                    
+                    <div class="tracker-card countdown">
+                        <div class="tracker-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="tracker-content">
+                            <h3>Time Until Meeting</h3>
+                            <div class="countdown-display" id="countdownTimer">
+                                <div class="countdown-item">
+                                    <span class="countdown-number" id="days">0</span>
+                                    <span class="countdown-label">Days</span>
+                                </div>
+                                <div class="countdown-item">
+                                    <span class="countdown-number" id="hours">0</span>
+                                    <span class="countdown-label">Hours</span>
+                                </div>
+                                <div class="countdown-item">
+                                    <span class="countdown-number" id="minutes">0</span>
+                                    <span class="countdown-label">Minutes</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tracker-card current-week">
+                        <div class="tracker-icon">
+                            <i class="fas fa-calendar-week"></i>
+                        </div>
+                        <div class="tracker-content">
+                            <h3>Current Program Week</h3>
+                            <p class="week-number" id="currentWeek">Week 0</p>
+                            <p class="program-progress" id="programProgress">Program hasn't started</p>
+                        </div>
+                    </div>
+                    
+                    <div class="tracker-card next-theme">
+                        <div class="tracker-icon">
+                            <i class="fas fa-compass"></i>
+                        </div>
+                        <div class="tracker-content">
+                            <h3>Current Theme</h3>
+                            <p class="theme-title" id="currentTheme">Loading...</p>
+                            <p class="theme-description" id="themeDescription">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section id="about" class="about">
             <div class="container">
                 <h2>About Our Program</h2>
@@ -231,5 +294,200 @@
             </div>
         </div>
     </footer>
+
+    <!-- Meeting Tracker JavaScript -->
+    <script>
+        // Meeting configuration
+        const MEETING_CONFIG = {
+            day: 2, // Tuesday (0 = Sunday, 1 = Monday, 2 = Tuesday, etc.)
+            hour: 18, // 6 PM
+            minute: 15, // 6:15 PM
+            programStart: new Date(new Date().getFullYear(), 8, 3), // First Tuesday of September
+            programEnd: new Date(new Date().getFullYear() + 1, 5, 30), // End of June
+            holidays: [
+                // Add holiday dates when meetings are cancelled
+                new Date(2024, 11, 24), // Christmas week
+                new Date(2024, 11, 31), // New Year's week
+                // Add more holidays as needed
+            ]
+        };
+
+        // Monthly themes from the program overview
+        const MONTHLY_THEMES = {
+            9: { title: "Team Building & Leadership", description: "Patrol formation, knots refresher, communication games" },
+            10: { title: "Seamanship Basics", description: "Navigation, signals, first aid on the water" },
+            11: { title: "Environment & Conservation", description: "Water stewardship, shoreline cleanup planning" },
+            12: { title: "Holiday Service Project", description: "Build community gifts, winter safety on water" },
+            1: { title: "Survival & Outdoor Skills", description: "Cold-weather prep, shelter building, compass & map skills" },
+            2: { title: "Citizenship & Service", description: "Leadership challenges, volunteer project planning" },
+            3: { title: "Nautical Engineering Fun", description: "Build model boats, buoyancy experiments, gear maintenance" },
+            4: { title: "Ceremonies & Awards", description: "Skills review, personal badge progress, service wrap-up" },
+            5: { title: "Major Project", description: "Practice for end-of-year camp/boating day" },
+            6: { title: "Major Project", description: "Practice for end-of-year camp/boating day" }
+        };
+
+        // Calculate next meeting date
+        function getNextMeetingDate() {
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            
+            // Start from today
+            let nextMeeting = new Date(today);
+            
+            // Find the next Tuesday
+            while (nextMeeting.getDay() !== MEETING_CONFIG.day) {
+                nextMeeting.setDate(nextMeeting.getDate() + 1);
+            }
+            
+            // Set the meeting time
+            nextMeeting.setHours(MEETING_CONFIG.hour, MEETING_CONFIG.minute, 0, 0);
+            
+            // If today is Tuesday but the meeting time has passed, get next Tuesday
+            if (nextMeeting <= now) {
+                nextMeeting.setDate(nextMeeting.getDate() + 7);
+            }
+            
+            // Check if it's during the program period
+            if (nextMeeting < MEETING_CONFIG.programStart || nextMeeting > MEETING_CONFIG.programEnd) {
+                return null; // No meetings during break
+            }
+            
+            // Check for holidays
+            while (isHoliday(nextMeeting)) {
+                nextMeeting.setDate(nextMeeting.getDate() + 7);
+                if (nextMeeting > MEETING_CONFIG.programEnd) {
+                    return null;
+                }
+            }
+            
+            return nextMeeting;
+        }
+        
+        function isHoliday(date) {
+            return MEETING_CONFIG.holidays.some(holiday => 
+                holiday.getTime() === date.getTime()
+            );
+        }
+
+        // Calculate current program week
+        function getCurrentWeek() {
+            const now = new Date();
+            const programStart = MEETING_CONFIG.programStart;
+            
+            if (now < programStart) {
+                return { week: 0, status: "Program hasn't started yet" };
+            }
+            
+            if (now > MEETING_CONFIG.programEnd) {
+                return { week: 0, status: "Program has ended for the year" };
+            }
+            
+            // Calculate weeks since program start
+            const timeDiff = now - programStart;
+            const weeksDiff = Math.floor(timeDiff / (7 * 24 * 60 * 60 * 1000)) + 1;
+            
+            return { 
+                week: weeksDiff, 
+                status: `Week ${weeksDiff} of the program year` 
+            };
+        }
+
+        // Get current month's theme
+        function getCurrentTheme() {
+            const now = new Date();
+            const month = now.getMonth() + 1; // JavaScript months are 0-indexed
+            
+            return MONTHLY_THEMES[month] || { 
+                title: "Program Break", 
+                description: "No meetings during summer break" 
+            };
+        }
+
+        // Update countdown timer
+        function updateCountdown() {
+            const nextMeeting = getNextMeetingDate();
+            
+            if (!nextMeeting) {
+                document.getElementById('days').textContent = '0';
+                document.getElementById('hours').textContent = '0';
+                document.getElementById('minutes').textContent = '0';
+                return;
+            }
+            
+            const now = new Date();
+            const timeDiff = nextMeeting - now;
+            
+            if (timeDiff <= 0) {
+                // Meeting is happening now or has passed
+                document.getElementById('days').textContent = '0';
+                document.getElementById('hours').textContent = '0';
+                document.getElementById('minutes').textContent = '0';
+                return;
+            }
+            
+            const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            document.getElementById('days').textContent = days;
+            document.getElementById('hours').textContent = hours;
+            document.getElementById('minutes').textContent = minutes;
+            
+            // Add special classes based on time remaining
+            const countdownCard = document.querySelector('.tracker-card.countdown');
+            countdownCard.classList.remove('meeting-today', 'meeting-tomorrow');
+            
+            if (days === 0 && hours <= 2) {
+                countdownCard.classList.add('meeting-today');
+            } else if (days === 1 || (days === 0 && hours > 2)) {
+                countdownCard.classList.add('meeting-tomorrow');
+            }
+        }
+
+        // Update all meeting information
+        function updateMeetingInfo() {
+            const nextMeeting = getNextMeetingDate();
+            const currentWeek = getCurrentWeek();
+            const currentTheme = getCurrentTheme();
+            
+            // Update next meeting date
+            if (nextMeeting) {
+                const options = { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                };
+                document.getElementById('nextMeetingDate').textContent = 
+                    nextMeeting.toLocaleDateString('en-US', options);
+            } else {
+                document.getElementById('nextMeetingDate').textContent = 
+                    'No meetings scheduled';
+            }
+            
+            // Update current week
+            document.getElementById('currentWeek').textContent = 
+                currentWeek.week > 0 ? `Week ${currentWeek.week}` : 'Program Break';
+            document.getElementById('programProgress').textContent = currentWeek.status;
+            
+            // Update current theme
+            document.getElementById('currentTheme').textContent = currentTheme.title;
+            document.getElementById('themeDescription').textContent = currentTheme.description;
+            
+            // Update countdown
+            updateCountdown();
+        }
+
+        // Initialize and start updates
+        document.addEventListener('DOMContentLoaded', function() {
+            updateMeetingInfo();
+            
+            // Update countdown every minute
+            setInterval(updateCountdown, 60000);
+            
+            // Update all meeting info every hour
+            setInterval(updateMeetingInfo, 3600000);
+        });
+    </script>
 </body>
 </html>
