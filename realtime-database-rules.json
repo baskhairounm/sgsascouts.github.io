@@ -1,0 +1,68 @@
+{
+  "rules": {
+    ".read": "auth != null && auth.token.email_verified == true && (auth.token.email == 'mbaskhairoun@gmail.com' || auth.token.email == 'admin@sgsascouts.com' || auth.token.email == 'leader@sgsascouts.com' || auth.token.email == 'coordinator@sgsascouts.com')",
+    ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'mbaskhairoun@gmail.com' || auth.token.email == 'admin@sgsascouts.com' || auth.token.email == 'leader@sgsascouts.com' || auth.token.email == 'coordinator@sgsascouts.com')",
+    
+    "scouts": {
+      "$scoutId": {
+        ".validate": "newData.hasChildren(['firstName', 'lastName', 'grade', 'parentName', 'parentPhone']) && newData.child('firstName').isString() && newData.child('lastName').isString() && newData.child('grade').isNumber() && newData.child('parentName').isString() && newData.child('parentPhone').isString()"
+      }
+    },
+    
+    "attendance": {
+      "$date": {
+        "$scoutId": {
+          ".validate": "newData.hasChildren(['status', 'timestamp', 'recordedBy']) && (newData.child('status').val() == 'present' || newData.child('status').val() == 'absent') && newData.child('timestamp').isString() && newData.child('recordedBy').isString()"
+        }
+      }
+    },
+    
+    "settings": {
+      ".validate": "auth != null && auth.token.email_verified == true"
+    }
+  }
+}
+
+/* 
+INSTRUCTIONS FOR APPLYING THESE RULES:
+
+1. Go to Firebase Console (https://console.firebase.google.com/)
+2. Select your 'sgsa-kids' project
+3. Navigate to "Realtime Database" in the left sidebar
+4. Click on the "Rules" tab at the top
+5. Replace the existing rules with the JSON above
+6. Click "Publish" to save the rules
+
+WHAT THESE RULES DO:
+
+✅ Security:
+- Only authenticated users with verified emails can access data
+- Only specific admin emails can read/write data
+- All data operations require authentication
+
+✅ Data Validation:
+- Scout records must have required fields (firstName, lastName, grade, parentName, parentPhone)
+- Attendance records must have status (present/absent), timestamp, and recordedBy
+- Prevents invalid data from being stored
+
+✅ Admin Emails Allowed:
+- mbaskhairoun@gmail.com (your email)
+- admin@sgsascouts.com
+- leader@sgsascouts.com  
+- coordinator@sgsascouts.com
+
+TO ADD MORE ADMINS:
+Add their email to the list in both ".read" and ".write" rules:
+|| auth.token.email == 'newemail@domain.com'
+
+FOR TESTING (TEMPORARY - LESS SECURE):
+If you want to test quickly, you can temporarily use:
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null"
+  }
+}
+
+Remember to change back to secure rules after testing!
+*/

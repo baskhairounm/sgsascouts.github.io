@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGSA Scouts - Admin Dashboard</title>
+    <link rel="stylesheet" href="admin-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal" style="display: flex;">
+        <div class="modal-content">
+            <div class="login-header">
+                <img src="logo.jpeg" alt="SGSA Scouts Logo" class="login-logo">
+                <h2>Admin Login</h2>
+                <p>Access the SGSA Scouts Admin Dashboard</p>
+            </div>
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" placeholder="Admin Email" required>
+                </div>
+                <div class="form-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="Password" required>
+                    <button type="button" class="toggle-password" onclick="togglePassword()">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <button type="submit" class="login-btn">
+                    <span>Sign In</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+            <div id="loginError" class="error-message"></div>
+            <div class="login-actions">
+                <button type="button" class="clear-session-btn" onclick="clearAuthSession()">
+                    <i class="fas fa-refresh"></i>
+                    Clear Session & Retry
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="dashboard" style="display: none;">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <img src="logo.jpeg" alt="SGSA Scouts Logo" class="sidebar-logo">
+                <h3>SGSA Admin</h3>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </li>
+                <li class="menu-item" data-section="scouts">
+                    <i class="fas fa-users"></i>
+                    <span>Scout Roster</span>
+                </li>
+                <li class="menu-item" data-section="attendance">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>Attendance</span>
+                </li>
+                <li class="menu-item" data-section="reports">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reports</span>
+                </li>
+                <li class="menu-item" data-section="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <h1 id="pageTitle">Dashboard</h1>
+                    <p id="pageSubtitle">Welcome to SGSA Scouts Admin Portal</p>
+                </div>
+                <div class="header-right">
+                    <div class="admin-info">
+                        <span id="adminName">Admin User</span>
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Section -->
+            <section id="dashboardSection" class="content-section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="totalScouts">0</h3>
+                            <p>Total Scouts</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="presentToday">0</h3>
+                            <p>Present Today</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="attendanceRate">0%</h3>
+                            <p>Attendance Rate</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-week"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="weeksSoFar">0</h3>
+                            <p>Weeks This Year</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-actions">
+                    <button class="action-btn primary" onclick="showSection('attendance')">
+                        <i class="fas fa-clipboard-check"></i>
+                        Take Attendance
+                    </button>
+                    <button class="action-btn secondary" onclick="showSection('scouts')">
+                        <i class="fas fa-user-plus"></i>
+                        Add New Scout
+                    </button>
+                    <button class="action-btn tertiary" onclick="exportData()">
+                        <i class="fas fa-download"></i>
+                        Export Reports
+                    </button>
+                </div>
+            </section>
+
+            <!-- Scout Roster Section -->
+            <section id="scoutsSection" class="content-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <h2>Scout Roster</h2>
+                        <p>Manage scout enrollment and information</p>
+                    </div>
+                    <button class="add-btn" onclick="showAddScoutModal()">
+                        <i class="fas fa-plus"></i>
+                        Add Scout
+                    </button>
+                </div>
+
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="scoutSearch" placeholder="Search scouts by name or grade..." onkeyup="filterScouts()">
+                </div>
+
+                <div class="scouts-grid" id="scoutsGrid">
+                    <!-- Scouts will be populated here -->
+                </div>
+            </section>
+
+            <!-- Attendance Section -->
+            <section id="attendanceSection" class="content-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <h2>Attendance Tracking</h2>
+                        <p>Weekly attendance management</p>
+                    </div>
+                    <div class="attendance-controls">
+                        <input type="date" id="attendanceDate" class="date-input">
+                        <button class="load-attendance-btn" onclick="loadAttendance()">
+                            <i class="fas fa-calendar-day"></i>
+                            Load Date
+                        </button>
+                    </div>
+                </div>
+
+                <div class="attendance-sheet" id="attendanceSheet">
+                    <!-- Attendance sheet will be populated here -->
+                </div>
+
+                <div class="attendance-actions">
+                    <button class="action-btn primary" onclick="saveAttendance()">
+                        <i class="fas fa-save"></i>
+                        Save Attendance
+                    </button>
+                    <button class="action-btn secondary" onclick="markAllPresent()">
+                        <i class="fas fa-check-double"></i>
+                        Mark All Present
+                    </button>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reportsSection" class="content-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <h2>Reports & Analytics</h2>
+                        <p>Generate and export attendance reports</p>
+                    </div>
+                </div>
+
+                <div class="reports-grid">
+                    <div class="report-card">
+                        <h3>Monthly Attendance Report</h3>
+                        <p>Detailed attendance breakdown by month</p>
+                        <button class="report-btn" onclick="generateMonthlyReport()">
+                            <i class="fas fa-calendar-alt"></i>
+                            Generate Report
+                        </button>
+                    </div>
+                    <div class="report-card">
+                        <h3>Scout List Export</h3>
+                        <p>Complete roster with contact information</p>
+                        <button class="report-btn" onclick="exportScoutList()">
+                            <i class="fas fa-users"></i>
+                            Export List
+                        </button>
+                    </div>
+                    <div class="report-card">
+                        <h3>Attendance Summary</h3>
+                        <p>Individual scout attendance statistics</p>
+                        <button class="report-btn" onclick="exportAttendanceSummary()">
+                            <i class="fas fa-chart-pie"></i>
+                            Export Summary
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settingsSection" class="content-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <h2>Admin Settings</h2>
+                        <p>Manage admin preferences and system settings</p>
+                    </div>
+                </div>
+
+                <div class="settings-grid">
+                    <div class="setting-card">
+                        <h3>Meeting Schedule</h3>
+                        <div class="setting-content">
+                            <label>Meeting Day:</label>
+                            <select id="meetingDay">
+                                <option value="tuesday">Tuesday</option>
+                                <option value="wednesday">Wednesday</option>
+                                <option value="thursday">Thursday</option>
+                            </select>
+                            <label>Meeting Time:</label>
+                            <input type="time" id="meetingTime" value="18:15">
+                        </div>
+                    </div>
+                    <div class="setting-card">
+                        <h3>Program Dates</h3>
+                        <div class="setting-content">
+                            <label>Program Start:</label>
+                            <input type="date" id="programStart">
+                            <label>Program End:</label>
+                            <input type="date" id="programEnd">
+                        </div>
+                    </div>
+                </div>
+
+                <button class="action-btn primary" onclick="saveSettings()">
+                    <i class="fas fa-save"></i>
+                    Save Settings
+                </button>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add Scout Modal -->
+    <div id="addScoutModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Add New Scout</h3>
+                <button class="close-btn" onclick="closeModal('addScoutModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addScoutForm" class="scout-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>First Name *</label>
+                        <input type="text" name="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name *</label>
+                        <input type="text" name="lastName" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Grade *</label>
+                        <select name="grade" required>
+                            <option value="">Select Grade</option>
+                            <option value="7">Grade 7</option>
+                            <option value="8">Grade 8</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Birth Date</label>
+                        <input type="date" name="birthDate">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Parent/Guardian Name *</label>
+                        <input type="text" name="parentName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Parent Email</label>
+                        <input type="email" name="parentEmail">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Parent Phone *</label>
+                        <input type="tel" name="parentPhone" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Emergency Contact</label>
+                        <input type="tel" name="emergencyContact">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Additional Notes</label>
+                    <textarea name="notes" rows="3"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="action-btn secondary" onclick="closeModal('addScoutModal')">Cancel</button>
+                    <button type="submit" class="action-btn primary">
+                        <i class="fas fa-plus"></i>
+                        Add Scout
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification" class="notification">
+        <div class="notification-content">
+            <i class="notification-icon"></i>
+            <span class="notification-message"></span>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="admin-script-realtime.js"></script>
+</body>
+</html>
