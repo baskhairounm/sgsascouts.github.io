@@ -24,13 +24,16 @@ let currentDate = new Date();
 // Initialize app
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, initializing app...');
-    
+
     // Ensure all modals are hidden by default
     hideAllModals();
-    
+
     initializeApp();
     setupEventListeners();
     setDefaultDate();
+
+    // Initialize bulk import functionality
+    initializeBulkImport();
 });
 
 // Function to hide all modals
@@ -2013,6 +2016,306 @@ function printLessonPlan() {
     `);
     printWindow.document.close();
     printWindow.print();
+}
+
+// Bulk Import Functions
+let importData = [];
+
+function showBulkImportModal() {
+    document.getElementById('bulkImportModal').style.display = 'flex';
+    resetImportModal();
+}
+
+function resetImportModal() {
+    importData = [];
+    document.getElementById('importPreview').style.display = 'none';
+    document.getElementById('importScoutsBtn').disabled = true;
+    document.getElementById('excelFileInput').value = '';
+
+    // Reset upload area
+    const uploadArea = document.getElementById('uploadArea');
+    uploadArea.classList.remove('file-selected');
+}
+
+// File upload event listeners - need to be added after DOM loads
+function initializeBulkImport() {
+    const fileInput = document.getElementById('excelFileInput');
+    const uploadArea = document.getElementById('uploadArea');
+
+    if (fileInput && uploadArea) {
+        fileInput.addEventListener('change', handleFileSelect);
+
+        // Drag and drop handlers
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFileSelect({ target: { files: files } });
+            }
+        });
+    }
+}
+
+function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.name.toLowerCase().endsWith('.xlsx') && !file.name.toLowerCase().endsWith('.xls')) {
+        showNotification('Please select an Excel file (.xlsx or .xls)', 'error');
+        return;
+    }
+
+    // Validate file size (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+        showNotification('File size must be less than 5MB', 'error');
+        return;
+    }
+
+    const uploadArea = document.getElementById('uploadArea');
+    uploadArea.classList.add('file-selected');
+    uploadArea.querySelector('h4').textContent = `Selected: ${file.name}`;
+    uploadArea.querySelector('p').textContent = `Size: ${(file.size / 1024).toFixed(1)} KB`;
+
+    processExcelFile(file);
+}
+
+function processExcelFile(file) {
+    showLoadingSpinner();
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+
+            // Get first worksheet
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+
+            // Convert to JSON
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+            if (jsonData.length === 0) {
+                hideLoadingSpinner();
+                showNotification('The Excel file is empty', 'error');
+                return;
+            }
+
+            parseScoutData(jsonData);
+            hideLoadingSpinner();
+
+        } catch (error) {
+            hideLoadingSpinner();
+            console.error('Error processing Excel file:', error);
+            showNotification('Error reading Excel file. Please check the file format.', 'error');
+        }
+    };
+
+    reader.readAsArrayBuffer(file);
+}
+
+function parseScoutData(rawData) {
+    if (rawData.length < 2) {
+        showNotification('Excel file must have at least a header row and one data row', 'error');
+        return;
+    }
+
+    const headers = rawData[0].map(header => header ? header.toString().toLowerCase().trim() : '');
+    const dataRows = rawData.slice(1);
+
+    // Find column indices
+    const columnMap = {
+        firstName: findColumnIndex(headers, ['first name', 'firstname', 'first']),
+        lastName: findColumnIndex(headers, ['last name', 'lastname', 'last']),
+        grade: findColumnIndex(headers, ['grade', 'level']),
+        birthDate: findColumnIndex(headers, ['birth date', 'birthdate', 'dob', 'date of birth']),
+        parentName: findColumnIndex(headers, ['parent name', 'parentname', 'parent', 'guardian']),
+        parentEmail: findColumnIndex(headers, ['parent email', 'parentemail', 'email']),
+        parentPhone: findColumnIndex(headers, ['parent phone', 'parentphone', 'phone']),
+        emergencyContact: findColumnIndex(headers, ['emergency contact', 'emergency', 'emergency phone']),
+        notes: findColumnIndex(headers, ['notes', 'comments', 'additional info'])
+    };
+
+    // Check required columns
+    const requiredColumns = ['firstName', 'lastName', 'grade', 'parentName', 'parentPhone'];
+    const missingColumns = requiredColumns.filter(col => columnMap[col] === -1);
+
+    if (missingColumns.length > 0) {
+        const readableColumns = missingColumns.map(col =>
+            col.replace(/([A-Z])/g, ' $1').toLowerCase().replace(/^\w/, c => c.toUpperCase())
+        );
+        showNotification(`Missing required columns: ${readableColumns.join(', ')}`, 'error');
+        return;
+    }
+
+    // Process each row
+    importData = dataRows.map((row, index) => {
+        const scout = {
+            rowNumber: index + 2, // +2 because we skip header and arrays are 0-indexed
+            firstName: getCellValue(row, columnMap.firstName),
+            lastName: getCellValue(row, columnMap.lastName),
+            grade: getCellValue(row, columnMap.grade),
+            birthDate: getCellValue(row, columnMap.birthDate),
+            parentName: getCellValue(row, columnMap.parentName),
+            parentEmail: getCellValue(row, columnMap.parentEmail),
+            parentPhone: getCellValue(row, columnMap.parentPhone),
+            emergencyContact: getCellValue(row, columnMap.emergencyContact),
+            notes: getCellValue(row, columnMap.notes),
+            errors: []
+        };
+
+        // Validate data
+        validateScoutData(scout);
+
+        return scout;
+    }).filter(scout => scout.firstName || scout.lastName); // Remove completely empty rows
+
+    displayImportPreview();
+}
+
+function findColumnIndex(headers, possibleNames) {
+    for (const name of possibleNames) {
+        const index = headers.findIndex(header => header.includes(name));
+        if (index !== -1) return index;
+    }
+    return -1;
+}
+
+function getCellValue(row, columnIndex) {
+    if (columnIndex === -1 || !row[columnIndex]) return '';
+    return row[columnIndex].toString().trim();
+}
+
+function validateScoutData(scout) {
+    // Required field validation
+    if (!scout.firstName) scout.errors.push('Missing first name');
+    if (!scout.lastName) scout.errors.push('Missing last name');
+    if (!scout.parentName) scout.errors.push('Missing parent name');
+    if (!scout.parentPhone) scout.errors.push('Missing parent phone');
+
+    // Grade validation
+    const grade = parseInt(scout.grade);
+    if (!grade || (grade !== 7 && grade !== 8)) {
+        scout.errors.push('Grade must be 7 or 8');
+    } else {
+        scout.grade = grade;
+    }
+
+    // Phone validation
+    if (scout.parentPhone && !/^[\d\s\-\(\)\+]+$/.test(scout.parentPhone)) {
+        scout.errors.push('Invalid phone number format');
+    }
+
+    // Email validation
+    if (scout.parentEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(scout.parentEmail)) {
+        scout.errors.push('Invalid email format');
+    }
+
+    // Birth date validation
+    if (scout.birthDate && scout.birthDate !== '') {
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!dateRegex.test(scout.birthDate)) {
+            scout.errors.push('Birth date must be in YYYY-MM-DD format');
+        }
+    }
+}
+
+function displayImportPreview() {
+    const previewDiv = document.getElementById('importPreview');
+    const tableBody = document.querySelector('#previewTable tbody');
+
+    const totalRows = importData.length;
+    const validRows = importData.filter(scout => scout.errors.length === 0).length;
+    const errorRows = totalRows - validRows;
+
+    // Update stats
+    document.getElementById('totalRows').textContent = totalRows;
+    document.getElementById('validRows').textContent = validRows;
+    document.getElementById('errorRows').textContent = errorRows;
+
+    // Generate table rows
+    tableBody.innerHTML = importData.map(scout => {
+        const statusIcon = scout.errors.length === 0 ?
+            '<i class="fas fa-check-circle" style="color: #28a745;"></i>' :
+            '<i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i>';
+
+        return `
+            <tr class="${scout.errors.length > 0 ? 'error-row' : 'valid-row'}">
+                <td>${statusIcon}</td>
+                <td>${scout.firstName}</td>
+                <td>${scout.lastName}</td>
+                <td>${scout.grade}</td>
+                <td>${scout.parentName}</td>
+                <td>${scout.parentPhone}</td>
+                <td class="error-cell">${scout.errors.join(', ') || 'Valid'}</td>
+            </tr>
+        `;
+    }).join('');
+
+    previewDiv.style.display = 'block';
+    document.getElementById('importScoutsBtn').disabled = validRows === 0;
+}
+
+async function importScouts() {
+    const validScouts = importData.filter(scout => scout.errors.length === 0);
+
+    if (validScouts.length === 0) {
+        showNotification('No valid scouts to import', 'error');
+        return;
+    }
+
+    const confirmed = confirm(`Import ${validScouts.length} valid scouts to the database?`);
+    if (!confirmed) return;
+
+    showLoadingSpinner();
+
+    try {
+        const scoutsRef = database.ref('scouts');
+        const batch = {};
+
+        validScouts.forEach(scout => {
+            const scoutId = scoutsRef.push().key;
+            batch[`scouts/${scoutId}`] = {
+                firstName: scout.firstName,
+                lastName: scout.lastName,
+                grade: scout.grade,
+                birthDate: scout.birthDate || '',
+                parentName: scout.parentName,
+                parentEmail: scout.parentEmail || '',
+                parentPhone: scout.parentPhone,
+                emergencyContact: scout.emergencyContact || '',
+                notes: scout.notes || '',
+                dateAdded: new Date().toISOString(),
+                addedBy: currentUser.email || 'bulk-import'
+            };
+        });
+
+        await database.ref().update(batch);
+
+        hideLoadingSpinner();
+        closeModal('bulkImportModal');
+        showNotification(`Successfully imported ${validScouts.length} scouts!`, 'success');
+
+        // Reload scouts list
+        loadScouts();
+
+    } catch (error) {
+        hideLoadingSpinner();
+        console.error('Error importing scouts:', error);
+        showNotification('Error importing scouts: ' + error.message, 'error');
+    }
 }
 
 function downloadCSV(csvContent, filename) {

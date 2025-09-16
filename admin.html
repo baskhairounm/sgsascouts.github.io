@@ -169,10 +169,16 @@
                         <h2>Scout Roster</h2>
                         <p>Manage scout enrollment and information</p>
                     </div>
-                    <button class="add-btn" onclick="showAddScoutModal()">
-                        <i class="fas fa-plus"></i>
-                        Add Scout
-                    </button>
+                    <div class="section-actions">
+                        <button class="add-btn secondary" onclick="showBulkImportModal()">
+                            <i class="fas fa-file-excel"></i>
+                            Import Excel
+                        </button>
+                        <button class="add-btn" onclick="showAddScoutModal()">
+                            <i class="fas fa-plus"></i>
+                            Add Scout
+                        </button>
+                    </div>
                 </div>
 
                 <div class="search-bar">
@@ -518,6 +524,118 @@
         </div>
     </div>
 
+    <!-- Bulk Import Modal -->
+    <div id="bulkImportModal" class="modal" style="display: none;">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Bulk Import Scouts from Excel</h3>
+                <button class="close-btn" onclick="closeModal('bulkImportModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="import-content">
+                <div class="import-instructions">
+                    <h4><i class="fas fa-info-circle"></i> Import Instructions</h4>
+                    <p>Upload an Excel file (.xlsx) with scout information. The file should have the following columns:</p>
+                    <div class="required-columns">
+                        <div class="column-item required">
+                            <span class="column-name">First Name</span>
+                            <span class="column-type">Required</span>
+                        </div>
+                        <div class="column-item required">
+                            <span class="column-name">Last Name</span>
+                            <span class="column-type">Required</span>
+                        </div>
+                        <div class="column-item required">
+                            <span class="column-name">Grade</span>
+                            <span class="column-type">Required (7 or 8)</span>
+                        </div>
+                        <div class="column-item">
+                            <span class="column-name">Birth Date</span>
+                            <span class="column-type">Optional (YYYY-MM-DD)</span>
+                        </div>
+                        <div class="column-item required">
+                            <span class="column-name">Parent Name</span>
+                            <span class="column-type">Required</span>
+                        </div>
+                        <div class="column-item">
+                            <span class="column-name">Parent Email</span>
+                            <span class="column-type">Optional</span>
+                        </div>
+                        <div class="column-item required">
+                            <span class="column-name">Parent Phone</span>
+                            <span class="column-type">Required</span>
+                        </div>
+                        <div class="column-item">
+                            <span class="column-name">Emergency Contact</span>
+                            <span class="column-type">Optional</span>
+                        </div>
+                        <div class="column-item">
+                            <span class="column-name">Notes</span>
+                            <span class="column-type">Optional</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="import-upload">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <h4>Drop Excel file here or click to browse</h4>
+                        <p>Supports .xlsx files up to 5MB</p>
+                        <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display: none;">
+                        <button class="browse-btn" onclick="document.getElementById('excelFileInput').click()">
+                            <i class="fas fa-folder-open"></i>
+                            Browse Files
+                        </button>
+                    </div>
+                </div>
+
+                <div class="import-preview" id="importPreview" style="display: none;">
+                    <h4><i class="fas fa-eye"></i> Preview Data</h4>
+                    <div class="preview-stats">
+                        <span class="stat-item">
+                            <strong id="totalRows">0</strong> scouts found
+                        </span>
+                        <span class="stat-item">
+                            <strong id="validRows">0</strong> valid
+                        </span>
+                        <span class="stat-item">
+                            <strong id="errorRows">0</strong> with errors
+                        </span>
+                    </div>
+                    <div class="preview-table-container">
+                        <table class="preview-table" id="previewTable">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Grade</th>
+                                    <th>Parent Name</th>
+                                    <th>Parent Phone</th>
+                                    <th>Issues</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Preview rows will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="import-actions">
+                    <button type="button" class="action-btn secondary" onclick="closeModal('bulkImportModal')">Cancel</button>
+                    <button type="button" class="action-btn primary" id="importScoutsBtn" onclick="importScouts()" disabled>
+                        <i class="fas fa-upload"></i>
+                        Import Scouts
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Edit Curriculum Modal -->
     <div id="editCurriculumModal" class="modal" style="display: none;">
         <div class="modal-content extra-large">
@@ -686,6 +804,10 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <!-- SheetJS for Excel processing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <script src="admin-script-realtime.js"></script>
 </body>
 </html>
