@@ -26,7 +26,6 @@
                     <i class="fas fa-lock"></i>
                     <input type="password" id="password" placeholder="Password" required>
                     <button type="button" class="toggle-password" onclick="togglePassword()">
-                        <i class="fas fa-eye"></i>
                     </button>
                 </div>
                 <button type="submit" class="login-btn">
@@ -64,6 +63,14 @@
                 <li class="menu-item" data-section="attendance">
                     <i class="fas fa-clipboard-check"></i>
                     <span>Attendance</span>
+                </li>
+                <li class="menu-item" data-section="announcements">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Announcements</span>
+                </li>
+                <li class="menu-item" data-section="curriculum">
+                    <i class="fas fa-book-open"></i>
+                    <span>Curriculum</span>
                 </li>
                 <li class="menu-item" data-section="reports">
                     <i class="fas fa-chart-bar"></i>
@@ -247,6 +254,121 @@
                 </div>
             </section>
 
+            <!-- Announcements Section -->
+            <section id="announcementsSection" class="content-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <h2>Announcements</h2>
+                        <p>Manage announcements displayed on the main website</p>
+                    </div>
+                    <button class="add-btn" onclick="showAddAnnouncementModal()">
+                        <i class="fas fa-plus"></i>
+                        Add Announcement
+                    </button>
+                </div>
+
+                <div class="announcements-grid" id="announcementsGrid">
+                    <!-- Announcements will be populated here -->
+                </div>
+            </section>
+
+            <!-- Curriculum Section -->
+            <section id="curriculumSection" class="content-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <h2>Curriculum Management</h2>
+                        <p>Manage weekly curriculum content and activities</p>
+                    </div>
+                    <div class="curriculum-controls">
+                        <select id="programYearSelect" class="year-select">
+                            <option value="">Select Program Year</option>
+                        </select>
+                        <button class="action-btn secondary" onclick="initializeCurrentYear()">
+                            <i class="fas fa-calendar-plus"></i>
+                            Initialize Current Year
+                        </button>
+                    </div>
+                </div>
+
+                <div class="curriculum-content">
+                    <div class="curriculum-view-controls">
+                        <div class="view-toggle">
+                            <button class="view-btn active" onclick="switchToWeekView()" id="weekViewBtn">
+                                <i class="fas fa-file-alt"></i>
+                                Week View
+                            </button>
+                            <button class="view-btn" onclick="switchToGridView()" id="gridViewBtn">
+                                <i class="fas fa-th"></i>
+                                Grid View
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Week View -->
+                    <div class="curriculum-week-container" id="weekViewContainer">
+                        <div class="curriculum-navigation">
+                            <div class="week-selector">
+                                <button class="week-nav-btn" onclick="navigateWeek(-1)" id="prevWeekBtn">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <div class="week-display">
+                                    <span class="week-label">Week</span>
+                                    <span class="week-number" id="currentWeekNumber">1</span>
+                                    <span class="week-date" id="currentWeekDate">Select a year</span>
+                                </div>
+                                <button class="week-nav-btn" onclick="navigateWeek(1)" id="nextWeekBtn">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                            <div class="week-actions">
+                                <button class="action-btn primary" onclick="editCurrentWeek()" id="editWeekBtn" disabled>
+                                    <i class="fas fa-edit"></i>
+                                    Edit Week
+                                </button>
+                                <button class="action-btn tertiary" onclick="copyFromPreviousWeek()" id="copyWeekBtn" disabled>
+                                    <i class="fas fa-copy"></i>
+                                    Copy Previous
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="curriculum-display" id="curriculumDisplay">
+                            <div class="curriculum-placeholder">
+                                <i class="fas fa-book-open"></i>
+                                <h3>Select a Program Year</h3>
+                                <p>Choose a program year to view and edit curriculum content</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grid View -->
+                    <div class="curriculum-grid-container" id="gridViewContainer" style="display: none;">
+                        <div class="curriculum-grid-header">
+                            <h3>Program Year Overview</h3>
+                            <div class="grid-controls">
+                                <input type="text" id="gridSearchInput" placeholder="Search weeks..." class="grid-search">
+                                <select id="monthFilterSelect" class="month-filter">
+                                    <option value="">All Months</option>
+                                    <option value="9">September</option>
+                                    <option value="10">October</option>
+                                    <option value="11">November</option>
+                                    <option value="12">December</option>
+                                    <option value="1">January</option>
+                                    <option value="2">February</option>
+                                    <option value="3">March</option>
+                                    <option value="4">April</option>
+                                    <option value="5">May</option>
+                                    <option value="6">June</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="curriculum-grid" id="curriculumGrid">
+                            <!-- Grid items will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Settings Section -->
             <section id="settingsSection" class="content-section">
                 <div class="section-header">
@@ -287,6 +409,194 @@
                 </button>
             </section>
         </main>
+    </div>
+
+    <!-- Add Announcement Modal -->
+    <div id="addAnnouncementModal" class="modal" style="display: none;">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Add New Announcement</h3>
+                <button class="close-btn" onclick="closeModal('addAnnouncementModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addAnnouncementForm" class="announcement-form">
+                <div class="form-group">
+                    <label>Title *</label>
+                    <input type="text" name="title" required maxlength="100" placeholder="Enter announcement title">
+                </div>
+                <div class="form-group">
+                    <label>Content *</label>
+                    <textarea name="content" required rows="5" placeholder="Enter announcement content" maxlength="500"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Priority *</label>
+                        <select name="priority" required>
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status *</label>
+                        <select name="active" required>
+                            <option value="true" selected>Active</option>
+                            <option value="false">Draft</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Preview</label>
+                    <div id="announcementPreview" class="announcement-preview">
+                        <div class="preview-title">Your announcement title will appear here</div>
+                        <div class="preview-content">Your announcement content will appear here</div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="action-btn secondary" onclick="closeModal('addAnnouncementModal')">Cancel</button>
+                    <button type="submit" class="action-btn primary">
+                        <i class="fas fa-plus"></i>
+                        Add Announcement
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Announcement Modal -->
+    <div id="editAnnouncementModal" class="modal" style="display: none;">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Edit Announcement</h3>
+                <button class="close-btn" onclick="closeModal('editAnnouncementModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="editAnnouncementForm" class="announcement-form">
+                <input type="hidden" name="announcementId">
+                <div class="form-group">
+                    <label>Title *</label>
+                    <input type="text" name="title" required maxlength="100" placeholder="Enter announcement title">
+                </div>
+                <div class="form-group">
+                    <label>Content *</label>
+                    <textarea name="content" required rows="5" placeholder="Enter announcement content" maxlength="500"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Priority *</label>
+                        <select name="priority" required>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status *</label>
+                        <select name="active" required>
+                            <option value="true">Active</option>
+                            <option value="false">Draft</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Preview</label>
+                    <div id="editAnnouncementPreview" class="announcement-preview">
+                        <div class="preview-title">Your announcement title will appear here</div>
+                        <div class="preview-content">Your announcement content will appear here</div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="action-btn secondary" onclick="closeModal('editAnnouncementModal')">Cancel</button>
+                    <button type="submit" class="action-btn primary">
+                        <i class="fas fa-save"></i>
+                        Update Announcement
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Curriculum Modal -->
+    <div id="editCurriculumModal" class="modal" style="display: none;">
+        <div class="modal-content extra-large">
+            <div class="modal-header">
+                <h3 id="curriculumModalTitle">Edit Week Curriculum</h3>
+                <button class="close-btn" onclick="closeModal('editCurriculumModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="editCurriculumForm" class="curriculum-form">
+                <input type="hidden" name="programYear">
+                <input type="hidden" name="weekNumber">
+
+                <div class="curriculum-form-header">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Week Number</label>
+                            <input type="number" name="displayWeek" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Meeting Date</label>
+                            <input type="date" name="meetingDate">
+                        </div>
+                        <div class="form-group">
+                            <label>Theme/Topic *</label>
+                            <input type="text" name="theme" required placeholder="e.g., Team Building & Leadership">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="curriculum-sections">
+                    <div class="curriculum-section">
+                        <h4><i class="fas fa-bullseye"></i> Learning Objectives</h4>
+                        <textarea name="objectives" rows="3" placeholder="What will scouts learn this week?"></textarea>
+                    </div>
+
+                    <div class="curriculum-section">
+                        <h4><i class="fas fa-list-check"></i> Activities & Content</h4>
+                        <div class="activity-list" id="activitiesList">
+                            <div class="activity-item">
+                                <input type="text" placeholder="Activity name" class="activity-name">
+                                <input type="number" placeholder="Duration (min)" class="activity-duration" min="1" max="90">
+                                <textarea placeholder="Activity description" class="activity-description" rows="2"></textarea>
+                                <button type="button" class="remove-activity-btn" onclick="removeActivity(this)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" class="action-btn tertiary small" onclick="addActivity()">
+                            <i class="fas fa-plus"></i>
+                            Add Activity
+                        </button>
+                    </div>
+
+                    <div class="curriculum-section">
+                        <h4><i class="fas fa-tools"></i> Materials Needed</h4>
+                        <textarea name="materials" rows="3" placeholder="List all materials, equipment, and supplies needed"></textarea>
+                    </div>
+
+                    <div class="curriculum-section">
+                        <h4><i class="fas fa-clipboard-check"></i> Assessment & Reflection</h4>
+                        <textarea name="assessment" rows="3" placeholder="How will you assess learning? Any reflection questions?"></textarea>
+                    </div>
+
+                    <div class="curriculum-section">
+                        <h4><i class="fas fa-sticky-note"></i> Notes & Reminders</h4>
+                        <textarea name="notes" rows="3" placeholder="Additional notes, safety considerations, or reminders"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="action-btn secondary" onclick="closeModal('editCurriculumModal')">Cancel</button>
+                    <button type="submit" class="action-btn primary">
+                        <i class="fas fa-save"></i>
+                        Save Curriculum
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Add Scout Modal -->

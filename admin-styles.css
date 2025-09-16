@@ -98,6 +98,8 @@ body {
     transform: translateY(-50%);
     color: #2c5aa0;
     font-size: 1.1rem;
+    z-index: 2;
+    pointer-events: none;
 }
 
 .form-group input {
@@ -108,6 +110,13 @@ body {
     font-size: 1rem;
     transition: all 0.3s ease;
     background: #f8f9fa;
+    text-indent: 20px;
+}
+
+.form-group input::placeholder {
+    color: #888;
+    font-size: 1rem;
+    text-indent: 20px;
 }
 
 .form-group input:focus {
@@ -1099,21 +1108,1312 @@ body {
     }
 }
 
+/* Announcement Styles */
+.announcements-grid {
+    display: grid;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.announcement-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid #ddd;
+    transition: all 0.3s ease;
+}
+
+.announcement-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.announcement-card.priority-high {
+    border-left-color: #f44336;
+}
+
+.announcement-card.priority-medium {
+    border-left-color: #ff9800;
+}
+
+.announcement-card.priority-low {
+    border-left-color: #4CAF50;
+}
+
+.announcement-card.status-draft {
+    opacity: 0.7;
+    background: #f9f9f9;
+}
+
+.announcement-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.announcement-meta {
+    display: flex;
+    gap: 10px;
+}
+
+.announcement-priority,
+.announcement-status {
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.announcement-priority.priority-high {
+    background: rgba(244, 67, 54, 0.1);
+    color: #f44336;
+}
+
+.announcement-priority.priority-medium {
+    background: rgba(255, 152, 0, 0.1);
+    color: #ff9800;
+}
+
+.announcement-priority.priority-low {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+}
+
+.announcement-status.status-active {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+}
+
+.announcement-status.status-draft {
+    background: rgba(158, 158, 158, 0.1);
+    color: #9e9e9e;
+}
+
+.announcement-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.announcement-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.announcement-text {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.announcement-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #999;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+.announcement-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.announcement-preview {
+    background: #f8f9fa;
+    border: 2px dashed #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 10px;
+}
+
+.preview-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.preview-content {
+    color: #666;
+    line-height: 1.6;
+}
+
+.action-btn.small {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+}
+
+.action-btn.danger:hover {
+    background: #d32f2f;
+}
+
+/* Curriculum Management Styles */
+.curriculum-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.year-select {
+    padding: 10px 15px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 1rem;
+    background: white;
+    min-width: 200px;
+}
+
+.curriculum-content {
+    margin-top: 30px;
+}
+
+.curriculum-navigation {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.week-selector {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.week-nav-btn {
+    background: #f8f9fa;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.week-nav-btn:hover:not(:disabled) {
+    background: #2c5aa0;
+    color: white;
+    border-color: #2c5aa0;
+}
+
+.week-nav-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.week-display {
+    text-align: center;
+    min-width: 150px;
+}
+
+.week-label {
+    display: block;
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.week-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c5aa0;
+    margin-bottom: 5px;
+}
+
+.week-date {
+    display: block;
+    font-size: 0.85rem;
+    color: #999;
+}
+
+.week-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.curriculum-display {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    min-height: 400px;
+}
+
+.curriculum-placeholder {
+    text-align: center;
+    padding: 80px 20px;
+    color: #666;
+}
+
+.curriculum-placeholder i {
+    font-size: 4rem;
+    color: #ddd;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.curriculum-placeholder h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.curriculum-week-view {
+    height: 100%;
+}
+
+.week-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.week-info h3 {
+    font-size: 2rem;
+    color: #2c5aa0;
+    margin-bottom: 5px;
+}
+
+.week-theme {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.week-date {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.week-status {
+    text-align: right;
+    font-size: 0.85rem;
+    color: #999;
+}
+
+.week-status span {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.week-status i {
+    margin-right: 5px;
+}
+
+.curriculum-content-view {
+    display: grid;
+    gap: 25px;
+}
+
+.content-section h4 {
+    font-size: 1.2rem;
+    color: #2c5aa0;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.content-section h4 i {
+    color: #ff6b35;
+}
+
+.content-text {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    line-height: 1.6;
+    color: #333;
+    white-space: pre-wrap;
+}
+
+.activities-display {
+    display: grid;
+    gap: 15px;
+}
+
+.activity-display-item {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    border-left: 4px solid #2c5aa0;
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.activity-name {
+    font-weight: 600;
+    color: #333;
+}
+
+.activity-duration {
+    background: #2c5aa0;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+}
+
+.activity-desc {
+    color: #666;
+    line-height: 1.5;
+}
+
+.empty-content {
+    text-align: center;
+    padding: 30px;
+    color: #999;
+    font-style: italic;
+}
+
+/* Curriculum Form Styles */
+.modal-content.extra-large {
+    max-width: 1000px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.curriculum-form {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.curriculum-form-header {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.curriculum-sections {
+    display: grid;
+    gap: 25px;
+}
+
+.curriculum-section {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    border-left: 4px solid #2c5aa0;
+}
+
+.curriculum-section h4 {
+    font-size: 1.1rem;
+    color: #2c5aa0;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.curriculum-section h4 i {
+    color: #ff6b35;
+}
+
+.curriculum-section textarea {
+    width: 100%;
+    resize: vertical;
+    min-height: 60px;
+}
+
+.activity-list {
+    display: grid;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.activity-item {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    border: 2px solid #ddd;
+    display: grid;
+    grid-template-columns: 2fr 100px 1fr auto;
+    gap: 10px;
+    align-items: start;
+}
+
+.activity-item input,
+.activity-item textarea {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 8px;
+}
+
+.activity-item textarea {
+    resize: vertical;
+    grid-column: 1 / -2;
+    margin-top: 10px;
+}
+
+.remove-activity-btn {
+    background: #f44336;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    align-self: start;
+}
+
+.remove-activity-btn:hover {
+    background: #d32f2f;
+}
+
+.action-btn.tertiary {
+    background: #f8f9fa;
+    color: #2c5aa0;
+    border: 2px solid #2c5aa0;
+}
+
+.action-btn.tertiary:hover {
+    background: #2c5aa0;
+    color: white;
+}
+
+/* View Toggle Styles */
+.curriculum-view-controls {
+    margin-bottom: 25px;
+}
+
+.view-toggle {
+    display: flex;
+    background: white;
+    border-radius: 10px;
+    padding: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: fit-content;
+}
+
+.view-btn {
+    background: transparent;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    color: #666;
+}
+
+.view-btn.active {
+    background: #2c5aa0;
+    color: white;
+    box-shadow: 0 2px 8px rgba(44, 90, 160, 0.3);
+}
+
+.view-btn:hover:not(.active) {
+    background: #f8f9fa;
+    color: #2c5aa0;
+}
+
+/* Enhanced Week View Styles */
+.week-duration {
+    color: #2c5aa0;
+    font-weight: 500;
+    margin-top: 5px;
+}
+
+.activity-number {
+    background: #2c5aa0;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-right: 10px;
+}
+
+.empty-week-content {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+    background: #f8f9fa;
+    border-radius: 15px;
+    border: 2px dashed #ddd;
+}
+
+.empty-week-content i {
+    font-size: 3rem;
+    color: #ddd;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.empty-week-content h4 {
+    color: #666;
+    margin-bottom: 10px;
+}
+
+/* Grid View Styles */
+.curriculum-grid-container {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.curriculum-grid-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.curriculum-grid-header h3 {
+    color: #2c5aa0;
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.grid-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.grid-search {
+    padding: 10px 15px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    min-width: 200px;
+}
+
+.month-filter {
+    padding: 10px 15px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    background: white;
+    min-width: 130px;
+}
+
+.curriculum-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.grid-week-card {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+}
+
+.grid-week-card:hover {
+    border-color: #2c5aa0;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(44, 90, 160, 0.15);
+}
+
+.grid-week-card.has-content {
+    border-color: #28a745;
+    background: linear-gradient(135deg, #f8fff9 0%, #ffffff 100%);
+}
+
+.grid-week-card.empty {
+    border-color: #dee2e6;
+    background: #f8f9fa;
+}
+
+.grid-week-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.grid-week-number {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #2c5aa0;
+}
+
+.grid-week-date {
+    font-size: 0.85rem;
+    color: #6c757d;
+    background: #e9ecef;
+    padding: 4px 8px;
+    border-radius: 15px;
+}
+
+.grid-week-content {
+    flex: 1;
+    margin-bottom: 15px;
+}
+
+.grid-week-theme {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+    line-height: 1.3;
+    min-height: 2.6rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.grid-week-card.empty .grid-week-theme {
+    color: #6c757d;
+    font-style: italic;
+}
+
+.grid-week-activities {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.activity-count {
+    background: #2c5aa0;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.activity-duration {
+    background: #ff6b35;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.grid-activity-list {
+    display: grid;
+    gap: 4px;
+}
+
+.grid-activity-item {
+    font-size: 0.85rem;
+    color: #555;
+    padding: 3px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.grid-activity-more {
+    font-size: 0.8rem;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.grid-no-content {
+    text-align: center;
+    padding: 30px 10px;
+    color: #6c757d;
+}
+
+.grid-no-content i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    display: block;
+    color: #dee2e6;
+}
+
+.grid-week-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+}
+
+.grid-edit-btn {
+    background: #2c5aa0;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0.7;
+}
+
+.grid-edit-btn:hover {
+    background: #1e3d6f;
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.grid-content-status {
+    color: #28a745;
+    font-size: 1.2rem;
+}
+
+.grid-placeholder {
+    text-align: center;
+    padding: 80px 20px;
+    color: #6c757d;
+}
+
+.grid-placeholder i {
+    font-size: 4rem;
+    color: #dee2e6;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.grid-placeholder h3 {
+    color: #495057;
+    margin-bottom: 10px;
+}
+
+/* Detailed Lesson Plan Styles */
+.lesson-plan-view {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.lesson-plan-header {
+    background: linear-gradient(135deg, #2c5aa0 0%, #1e3d6f 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+}
+
+.lesson-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+}
+
+.summary-item {
+    text-align: center;
+}
+
+.summary-label {
+    display: block;
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 5px;
+}
+
+.summary-value {
+    display: block;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.lesson-section {
+    margin-bottom: 40px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 25px;
+    border-left: 5px solid #2c5aa0;
+}
+
+.lesson-section-header {
+    margin-bottom: 20px;
+}
+
+.lesson-section-header h3 {
+    color: #2c5aa0;
+    font-size: 1.4rem;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.lesson-section-header h3 i {
+    color: #ff6b35;
+}
+
+.section-description {
+    color: #6c757d;
+    font-style: italic;
+    font-size: 0.95rem;
+}
+
+.lesson-content {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+/* Learning Objectives */
+.objectives-list {
+    display: grid;
+    gap: 12px;
+}
+
+.objective-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    background: #f8fff9;
+    border-radius: 8px;
+    border-left: 3px solid #28a745;
+}
+
+.objective-item i {
+    color: #28a745;
+    margin-top: 2px;
+}
+
+/* Activity Timeline */
+.activity-timeline {
+    display: grid;
+    gap: 20px;
+}
+
+.timeline-activity {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.activity-time {
+    background: #2c5aa0;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.time-start {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.time-duration {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 5px;
+}
+
+.time-end {
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+.activity-content {
+    padding: 5px 0;
+}
+
+.activity-title {
+    color: #2c5aa0;
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.activity-title .activity-number {
+    background: #ff6b35;
+    color: white;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.description-text {
+    line-height: 1.6;
+    color: #333;
+}
+
+.no-description {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Materials List */
+.materials-list {
+    display: grid;
+    gap: 10px;
+}
+
+.material-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: #fff3e0;
+    border-radius: 6px;
+    border-left: 3px solid #ff9800;
+}
+
+.material-item i {
+    color: #ff9800;
+}
+
+/* Assessment and Notes */
+.assessment-content,
+.notes-content {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #2c5aa0;
+}
+
+.assessment-text,
+.notes-text {
+    line-height: 1.6;
+    color: #333;
+}
+
+/* Empty Sections */
+.empty-section {
+    text-align: center;
+    padding: 30px;
+    color: #6c757d;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 2px dashed #dee2e6;
+}
+
+.empty-section i {
+    font-size: 2.5rem;
+    color: #dee2e6;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.empty-section small {
+    display: block;
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: #999;
+}
+
+/* Lesson Actions */
+.lesson-actions {
+    margin-top: 40px;
+    padding-top: 25px;
+    border-top: 2px solid #f0f0f0;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.lesson-action-btn {
+    background: white;
+    border: 2px solid #2c5aa0;
+    color: #2c5aa0;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.lesson-action-btn:hover {
+    background: #2c5aa0;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3);
+}
+
+.lesson-action-btn.print {
+    border-color: #28a745;
+    color: #28a745;
+}
+
+.lesson-action-btn.print:hover {
+    background: #28a745;
+    color: white;
+}
+
+.lesson-action-btn.copy {
+    border-color: #6c757d;
+    color: #6c757d;
+}
+
+.lesson-action-btn.copy:hover {
+    background: #6c757d;
+    color: white;
+}
+
+/* Empty Lesson Plan */
+.empty-lesson-plan {
+    text-align: center;
+    padding: 60px 30px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px;
+    border: 2px dashed #dee2e6;
+}
+
+.empty-lesson-icon i {
+    font-size: 4rem;
+    color: #dee2e6;
+    margin-bottom: 20px;
+}
+
+.empty-lesson-plan h3 {
+    color: #495057;
+    margin-bottom: 15px;
+}
+
+.empty-lesson-plan p {
+    color: #6c757d;
+    margin-bottom: 25px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.start-planning-btn {
+    background: #2c5aa0;
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+.start-planning-btn:hover {
+    background: #1e3d6f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3);
+}
+
 @media (max-width: 480px) {
     .scouts-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .scout-card {
         padding: 20px;
     }
-    
+
     .dashboard-actions {
         gap: 15px;
     }
-    
+
     .action-btn {
         padding: 12px 20px;
         font-size: 0.9rem;
+    }
+
+    .announcements-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .announcement-card {
+        padding: 20px;
+    }
+
+    .announcement-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .announcement-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .curriculum-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .curriculum-navigation {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+
+    .week-actions {
+        justify-content: center;
+    }
+
+    .week-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .week-status {
+        text-align: center;
+    }
+
+    .activity-item {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .activity-item textarea {
+        grid-column: 1;
+        margin-top: 10px;
+    }
+
+    .modal-content.extra-large {
+        margin: 10px;
+        max-height: 95vh;
+    }
+
+    .curriculum-form-header .form-row {
+        flex-direction: column;
+    }
+
+    .view-toggle {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .curriculum-grid-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .grid-controls {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .grid-search,
+    .month-filter {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .curriculum-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .grid-week-card {
+        min-height: auto;
+        padding: 15px;
+    }
+
+    .grid-week-activities {
+        flex-wrap: wrap;
+    }
+
+    /* Lesson Plan Mobile Styles */
+    .lesson-plan-view {
+        padding: 20px;
+    }
+
+    .lesson-plan-header {
+        padding: 20px;
+    }
+
+    .lesson-summary {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .lesson-section {
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    .timeline-activity {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .activity-time {
+        text-align: left;
+        padding: 12px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .lesson-action-btn {
+        justify-content: center;
+    }
+
+    .empty-lesson-plan {
+        padding: 40px 20px;
     }
 }

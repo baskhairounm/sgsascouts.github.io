@@ -21,6 +21,7 @@
                     <li><a href="#about">About</a></li>
                     <li><a href="#program">Program</a></li>
                     <li><a href="#activities">Activities</a></li>
+                    <li><a href="#announcements-feed">Announcements</a></li>
                     <li><a href="#join">Join Us</a></li>
                     <li><a href="admin.html" class="admin-link" title="Admin Dashboard">
                         <i class="fas fa-user-shield"></i>
@@ -74,7 +75,7 @@
                             <p class="meeting-time">Tuesday 6:15 PM - 7:45 PM</p>
                         </div>
                     </div>
-                    
+
                     <div class="tracker-card countdown">
                         <div class="tracker-icon">
                             <i class="fas fa-clock"></i>
@@ -97,7 +98,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="tracker-card current-week">
                         <div class="tracker-icon">
                             <i class="fas fa-calendar-week"></i>
@@ -108,7 +109,7 @@
                             <p class="program-progress" id="programProgress">Program hasn't started</p>
                         </div>
                     </div>
-                    
+
                     <div class="tracker-card next-theme">
                         <div class="tracker-icon">
                             <i class="fas fa-compass"></i>
@@ -119,6 +120,15 @@
                             <p class="theme-description" id="themeDescription">Loading...</p>
                         </div>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="announcements-feed" class="announcements-feed">
+            <div class="container">
+                <h2>Latest Announcements</h2>
+                <div id="announcementsFeed" class="announcements-feed-list">
+                    <!-- Announcements will be populated here -->
                 </div>
             </div>
         </section>
@@ -294,6 +304,10 @@
             </div>
         </div>
     </footer>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <!-- Meeting Tracker JavaScript -->
     <script>
@@ -481,13 +495,116 @@
         // Initialize and start updates
         document.addEventListener('DOMContentLoaded', function() {
             updateMeetingInfo();
-            
+            loadAnnouncementsFeed();
+
             // Update countdown every minute
             setInterval(updateCountdown, 60000);
-            
+
             // Update all meeting info every hour
             setInterval(updateMeetingInfo, 3600000);
+
+            // Update announcements every 5 minutes
+            setInterval(loadAnnouncementsFeed, 300000);
         });
+
+        // Firebase Configuration for announcements feed
+        const firebaseConfig = {
+            apiKey: "AIzaSyATW5HErUw05Ij28L6974sR12lVO8Av_ew",
+            authDomain: "sgsa-kids.firebaseapp.com",
+            databaseURL: "https://sgsa-kids-default-rtdb.firebaseio.com",
+            projectId: "sgsa-kids",
+            storageBucket: "sgsa-kids.firebasestorage.app",
+            messagingSenderId: "988633336020",
+            appId: "1:988633336020:web:f9f2055d4dd7996ad51341",
+            measurementId: "G-X98HHTS026"
+        };
+
+        // Initialize Firebase for announcements
+        let announcementsApp, announcementsDatabase;
+        try {
+            announcementsApp = firebase.initializeApp(firebaseConfig, 'announcements');
+            announcementsDatabase = announcementsApp.database();
+        } catch (error) {
+            console.error('Firebase initialization error:', error);
+        }
+
+        // Load announcements feed
+        async function loadAnnouncementsFeed() {
+            if (!announcementsDatabase) {
+                console.warn('Firebase not initialized for announcements');
+                return;
+            }
+
+            try {
+                const announcementsRef = announcementsDatabase.ref('announcements');
+                const snapshot = await announcementsRef.orderByChild('timestamp').limitToLast(5).once('value');
+
+                const announcements = [];
+                if (snapshot.exists()) {
+                    snapshot.forEach(childSnapshot => {
+                        const announcement = childSnapshot.val();
+                        // Only show active announcements
+                        if (announcement.active) {
+                            announcements.push({
+                                id: childSnapshot.key,
+                                ...announcement
+                            });
+                        }
+                    });
+
+                    // Sort by timestamp (newest first)
+                    announcements.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                }
+
+                displayAnnouncementsFeed(announcements);
+            } catch (error) {
+                console.error('Error loading announcements:', error);
+                displayAnnouncementsFeed([]);
+            }
+        }
+
+        // Display announcements feed
+        function displayAnnouncementsFeed(announcements) {
+            const feedContainer = document.getElementById('announcementsFeed');
+
+            if (announcements.length === 0) {
+                feedContainer.innerHTML = `
+                    <div class="no-announcements">
+                        <i class="fas fa-info-circle"></i>
+                        <p>No announcements at this time. Check back later for updates!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            feedContainer.innerHTML = announcements.map(announcement => {
+                const priorityClass = `priority-${announcement.priority || 'medium'}`;
+                const dateCreated = new Date(announcement.timestamp).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                return `
+                    <div class="announcement-item ${priorityClass}">
+                        <div class="announcement-badge">
+                            <i class="fas fa-bullhorn"></i>
+                            <span class="priority-label">${(announcement.priority || 'medium').toUpperCase()}</span>
+                        </div>
+                        <div class="announcement-body">
+                            <h3 class="announcement-title">${announcement.title}</h3>
+                            <p class="announcement-content">${announcement.content}</p>
+                            <div class="announcement-meta">
+                                <span class="announcement-date">
+                                    <i class="fas fa-calendar"></i>
+                                    ${dateCreated}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
     </script>
 </body>
 </html>
