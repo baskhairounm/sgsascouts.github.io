@@ -276,6 +276,212 @@ main {
     transform: rotate(180deg);
 }
 
+/* Teams Section */
+.teams {
+    padding: 100px 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    position: relative;
+}
+
+.teams h2 {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #1e3d6f;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+}
+
+.teams-intro {
+    font-size: 1.2rem;
+    text-align: center;
+    margin-bottom: 60px;
+    color: #666;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.teams-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 40px;
+    margin-bottom: 60px;
+}
+
+.team-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.team-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+
+.team-card.cubs {
+    border-top: 5px solid #4caf50;
+}
+
+.team-card.cubs .team-icon {
+    background: linear-gradient(135deg, #4caf50, #2e7d32);
+}
+
+.team-card.scouts {
+    border-top: 5px solid #2196f3;
+}
+
+.team-card.scouts .team-icon {
+    background: linear-gradient(135deg, #2196f3, #1565c0);
+}
+
+.team-card.rovers {
+    border-top: 5px solid #ff9800;
+}
+
+.team-card.rovers .team-icon {
+    background: linear-gradient(135deg, #ff9800, #e65100);
+}
+
+.team-header {
+    padding: 30px 30px 20px;
+    text-align: center;
+    position: relative;
+}
+
+.team-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.team-icon i {
+    font-size: 2.5rem;
+    color: white;
+}
+
+.team-header h3 {
+    font-size: 1.8rem;
+    color: #1e3d6f;
+    margin-bottom: 10px;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+}
+
+.team-grades {
+    display: inline-block;
+    background: linear-gradient(135deg, #1e3d6f, #2c5aa0);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.team-content {
+    padding: 0 30px 20px;
+    flex: 1;
+}
+
+.team-content p {
+    font-size: 1rem;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.team-highlights h4 {
+    color: #1e3d6f;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.team-highlights ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.team-highlights li {
+    position: relative;
+    padding: 8px 0 8px 25px;
+    color: #555;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.team-highlights li::before {
+    content: '⚓';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    color: #2c5aa0;
+    font-size: 1rem;
+}
+
+.team-footer {
+    padding: 20px 30px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    text-align: center;
+    border-top: 1px solid #e0e0e0;
+}
+
+.team-age {
+    font-weight: 600;
+    color: #1e3d6f;
+    font-size: 1rem;
+}
+
+.team-meeting-info {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.team-meeting-info h3 {
+    font-size: 2rem;
+    color: #1e3d6f;
+    margin-bottom: 30px;
+    font-family: 'Playfair Display', serif;
+}
+
+.meeting-schedule {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.schedule-item {
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 15px;
+    border-left: 4px solid #2c5aa0;
+}
+
+.schedule-item strong {
+    color: #1e3d6f;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+}
+
 /* Meeting Tracker Section */
 .meeting-tracker {
     padding: 100px 0;
@@ -770,8 +976,8 @@ main {
 
 .join-info {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-    gap: 50px;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 40px;
 }
 
 .join-card {
@@ -853,6 +1059,27 @@ main {
 .contact-button:hover {
     transform: translateY(-3px);
     box-shadow: 0 12px 35px rgba(255, 255, 255, 0.3);
+}
+
+.team-guide {
+    text-align: left;
+}
+
+.guide-item {
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 15px;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    border-left: 4px solid rgba(255, 255, 255, 0.5);
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
+.guide-item strong {
+    color: white;
+    display: block;
+    margin-bottom: 5px;
 }
 
 /* Footer */
@@ -978,7 +1205,19 @@ footer {
         font-size: 2rem;
     }
     
-    .themes-grid, .activities-grid, .join-info {
+    .teams-grid, .themes-grid, .activities-grid, .join-info {
+        grid-template-columns: 1fr;
+    }
+
+    .teams h2 {
+        font-size: 2.5rem;
+    }
+
+    .team-meeting-info {
+        padding: 30px;
+    }
+
+    .meeting-schedule {
         grid-template-columns: 1fr;
     }
     
@@ -1017,10 +1256,30 @@ footer {
         font-size: 2rem;
     }
     
-    .about, .program, .activities, .join {
+    .teams, .about, .program, .activities, .join {
         padding: 80px 0;
     }
-    
+
+    .teams h2 {
+        font-size: 2rem;
+    }
+
+    .team-card {
+        margin-bottom: 30px;
+    }
+
+    .team-header {
+        padding: 25px 25px 15px;
+    }
+
+    .team-content {
+        padding: 0 25px 15px;
+    }
+
+    .team-meeting-info {
+        padding: 25px;
+    }
+
     .meeting-info, .theme-card, .activity-card, .join-card {
         padding: 30px;
     }
