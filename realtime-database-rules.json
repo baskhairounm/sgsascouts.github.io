@@ -10,9 +10,11 @@
     },
     
     "attendance": {
-      "$date": {
-        "$scoutId": {
-          ".validate": "newData.hasChildren(['status', 'timestamp', 'recordedBy']) && (newData.child('status').val() == 'present' || newData.child('status').val() == 'absent') && newData.child('timestamp').isString() && newData.child('recordedBy').isString()"
+      "$team": {
+        "$date": {
+          "$scoutId": {
+            ".validate": "newData.hasChildren(['status', 'timestamp', 'recordedBy']) && (newData.child('status').val() == 'present' || newData.child('status').val() == 'absent' || newData.child('status').val() == 'excused') && newData.child('timestamp').isString() && newData.child('recordedBy').isString()"
+          }
         }
       }
     },

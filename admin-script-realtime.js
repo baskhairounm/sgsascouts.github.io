@@ -518,7 +518,7 @@ async function loadAttendance() {
             });
         }
 
-        displayAttendanceSheet(teamScouts, selectedDate, selectedTeam);
+        displayAttendanceSheet(teamScouts, selectedDate, selectedTeam, attendanceData);
         hideLoadingSpinner();
     } catch (error) {
         hideLoadingSpinner();
@@ -623,36 +623,52 @@ function loadReportsData() {
 
 async function generateMonthlyReport() {
     showLoadingSpinner();
-    
+
     try {
         const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM format
-        const attendanceRef = database.ref('attendance');
-        const snapshot = await attendanceRef.once('value');
-        
-        const monthlyData = [];
-        if (snapshot.exists()) {
-            const allAttendance = snapshot.val();
-            
-            // Filter for current month
-            Object.keys(allAttendance).forEach(dateKey => {
-                const date = dateKey.replace(/_/g, '-');
-                if (date.startsWith(currentMonth)) {
-                    const dayData = allAttendance[dateKey];
-                    Object.keys(dayData).forEach(scoutId => {
-                        monthlyData.push({
-                            date: date,
-                            scoutId: scoutId,
-                            ...dayData[scoutId]
-                        });
-                    });
-                }
+        const [attendanceSnapshot, scoutsSnapshot] = await Promise.all([
+            database.ref('attendance').once('value'),
+            database.ref('scouts').once('value')
+        ]);
+
+        // Get scouts data for names
+        const scoutsData = {};
+        if (scoutsSnapshot.exists()) {
+            scoutsSnapshot.forEach(childSnapshot => {
+                const scout = childSnapshot.val();
+                scoutsData[childSnapshot.key] = `${scout.firstName} ${scout.lastName}`;
             });
         }
-        
+
+        const monthlyData = [];
+        if (attendanceSnapshot.exists()) {
+            const allAttendance = attendanceSnapshot.val();
+
+            // Process team-based attendance structure
+            Object.keys(allAttendance).forEach(team => {
+                const teamAttendance = allAttendance[team];
+                Object.keys(teamAttendance).forEach(dateKey => {
+                    const date = dateKey.replace(/_/g, '-');
+                    if (date.startsWith(currentMonth)) {
+                        const dayData = teamAttendance[dateKey];
+                        Object.keys(dayData).forEach(scoutId => {
+                            monthlyData.push({
+                                date: date,
+                                team: team,
+                                scoutId: scoutId,
+                                scoutName: scoutsData[scoutId] || 'Unknown Scout',
+                                ...dayData[scoutId]
+                            });
+                        });
+                    }
+                });
+            });
+        }
+
         // Generate CSV content
         const csvContent = generateAttendanceCSV(monthlyData);
         downloadCSV(csvContent, `attendance-report-${currentMonth}.csv`);
-        
+
         hideLoadingSpinner();
         showNotification('Monthly report generated!', 'success');
     } catch (error) {
@@ -707,16 +723,22 @@ async function exportAttendanceSummary() {
         const attendanceSummary = {};
         if (attendanceSnapshot.exists()) {
             const allAttendance = attendanceSnapshot.val();
-            
-            Object.keys(allAttendance).forEach(dateKey => {
-                const dayData = allAttendance[dateKey];
-                Object.keys(dayData).forEach(scoutId => {
-                    if (!attendanceSummary[scoutId]) {
-                        attendanceSummary[scoutId] = { present: 0, absent: 0, total: 0 };
-                    }
-                    const status = dayData[scoutId].status;
-                    attendanceSummary[scoutId][status]++;
-                    attendanceSummary[scoutId].total++;
+
+            // Process team-based attendance structure
+            Object.keys(allAttendance).forEach(team => {
+                const teamAttendance = allAttendance[team];
+                Object.keys(teamAttendance).forEach(dateKey => {
+                    const dayData = teamAttendance[dateKey];
+                    Object.keys(dayData).forEach(scoutId => {
+                        if (!attendanceSummary[scoutId]) {
+                            attendanceSummary[scoutId] = { present: 0, absent: 0, excused: 0, total: 0 };
+                        }
+                        const status = dayData[scoutId].status;
+                        if (attendanceSummary[scoutId][status] !== undefined) {
+                            attendanceSummary[scoutId][status]++;
+                        }
+                        attendanceSummary[scoutId].total++;
+                    });
                 });
             });
         }
@@ -887,15 +909,16 @@ function getErrorMessage(errorCode) {
 
 // CSV Generation Functions
 function generateAttendanceCSV(attendanceData) {
-    const headers = ['Date', 'Scout ID', 'Scout Name', 'Status', 'Recorded By'];
+    const headers = ['Date', 'Team', 'Scout ID', 'Scout Name', 'Status', 'Recorded By'];
     const rows = attendanceData.map(record => [
         record.date,
+        getTeamName(record.team || 'scouts'),
         record.scoutId,
-        getScoutName(record.scoutId),
+        record.scoutName || 'Unknown Scout',
         record.status,
         record.recordedBy || ''
     ]);
-    
+
     return [headers, ...rows].map(row => row.join(',')).join('\n');
 }
 
@@ -917,29 +940,28 @@ function generateScoutsCSV(scoutsData) {
 }
 
 function generateAttendanceSummaryCSV(scoutsData, attendanceSummary) {
-    const headers = ['Scout Name', 'Grade', 'Total Sessions', 'Present', 'Absent', 'Attendance Rate'];
+    const headers = ['Scout Name', 'Grade', 'Team', 'Total Sessions', 'Present', 'Absent', 'Excused', 'Attendance Rate'];
     const rows = Object.keys(scoutsData).map(scoutId => {
         const scout = scoutsData[scoutId];
-        const summary = attendanceSummary[scoutId] || { present: 0, absent: 0, total: 0 };
+        const summary = attendanceSummary[scoutId] || { present: 0, absent: 0, excused: 0, total: 0 };
         const rate = summary.total > 0 ? Math.round((summary.present / summary.total) * 100) : 0;
-        
+        const team = scout.team || getTeamFromGrade(scout.grade);
+
         return [
             `${scout.firstName} ${scout.lastName}`,
             scout.grade,
+            getTeamName(team),
             summary.total,
             summary.present,
             summary.absent,
+            summary.excused,
             rate + '%'
         ];
     });
-    
+
     return [headers, ...rows].map(row => row.join(',')).join('\n');
 }
 
-function getScoutName(scoutId) {
-    const scout = scouts.find(s => s.id === scoutId);
-    return scout ? `${scout.firstName} ${scout.lastName}` : 'Unknown Scout';
-}
 
 // Announcement Management Functions
 let announcements = [];
@@ -2424,8 +2446,12 @@ function updateTeamStatistics(scouts) {
 
     scouts.forEach(scout => {
         const team = scout.team || getTeamFromGrade(scout.grade);
-        if (teamCounts.hasOwnProperty(team)) {
-            teamCounts[team]++;
+        if (team === 'cubs') {
+            teamCounts.cubs++;
+        } else if (team === 'scouts') {
+            teamCounts.scouts++;
+        } else if (team === 'rovers') {
+            teamCounts.rovers++;
         }
     });
 
@@ -2534,14 +2560,30 @@ async function loadAttendanceByTeam(team) {
         // Get selected date
         const dateInput = document.getElementById('attendanceDate');
         const selectedDate = dateInput.value;
+        const dateToUse = selectedDate || new Date().toISOString().split('T')[0];
 
         if (!selectedDate) {
             // Set today's date as default
-            const today = new Date().toISOString().split('T')[0];
-            dateInput.value = today;
+            dateInput.value = dateToUse;
         }
 
-        displayAttendanceSheet(teamScouts, selectedDate || dateInput.value, team);
+        // Load attendance data for this date and team
+        const attendanceData = {};
+        if (selectedDate) {
+            const attendanceRef = database.ref(`attendance/${team}/${selectedDate.replace(/-/g, '_')}`);
+            const snapshot = await attendanceRef.once('value');
+
+            if (snapshot.exists()) {
+                const data = snapshot.val() || {};
+                teamScouts.forEach(scout => {
+                    if (data[scout.id]) {
+                        attendanceData[scout.id] = data[scout.id];
+                    }
+                });
+            }
+        }
+
+        displayAttendanceSheet(teamScouts, dateToUse, team, attendanceData);
 
         hideLoadingSpinner();
     } catch (error) {
@@ -2551,7 +2593,7 @@ async function loadAttendanceByTeam(team) {
     }
 }
 
-function displayAttendanceSheet(scouts, date, team) {
+function displayAttendanceSheet(scouts, date, team, attendanceData = {}) {
     const sheet = document.getElementById('attendanceSheet');
     if (!sheet) return;
 
@@ -2579,7 +2621,11 @@ function displayAttendanceSheet(scouts, date, team) {
             <p>${dateFormatted}</p>
         </div>
         <div class="attendance-list">
-            ${scouts.map(scout => `
+            ${scouts.map(scout => {
+                const savedAttendance = attendanceData[scout.id];
+                const savedStatus = savedAttendance ? savedAttendance.status : '';
+
+                return `
                 <div class="attendance-item" data-scout-id="${scout.id}">
                     <div class="scout-info">
                         <span class="scout-name">${scout.firstName} ${scout.lastName}</span>
@@ -2587,20 +2633,21 @@ function displayAttendanceSheet(scouts, date, team) {
                     </div>
                     <div class="attendance-controls">
                         <label class="attendance-option">
-                            <input type="radio" name="attendance_${scout.id}" value="present">
+                            <input type="radio" name="attendance_${scout.id}" value="present" ${savedStatus === 'present' ? 'checked' : ''}>
                             <span class="checkmark present">Present</span>
                         </label>
                         <label class="attendance-option">
-                            <input type="radio" name="attendance_${scout.id}" value="absent">
+                            <input type="radio" name="attendance_${scout.id}" value="absent" ${savedStatus === 'absent' ? 'checked' : ''}>
                             <span class="checkmark absent">Absent</span>
                         </label>
                         <label class="attendance-option">
-                            <input type="radio" name="attendance_${scout.id}" value="excused">
+                            <input type="radio" name="attendance_${scout.id}" value="excused" ${savedStatus === 'excused' ? 'checked' : ''}>
                             <span class="checkmark excused">Excused</span>
                         </label>
                     </div>
                 </div>
-            `).join('')}
+                `;
+            }).join('')}
         </div>
     `;
 }
@@ -2710,10 +2757,17 @@ async function updateDashboardStats() {
 
         scoutsArray.forEach(scout => {
             const team = scout.team || getTeamFromGrade(scout.grade);
-            if (teamCounts.hasOwnProperty(team)) {
-                teamCounts[team]++;
+            console.log(`Scout: ${scout.firstName} ${scout.lastName}, Grade: ${scout.grade}, Team: ${team}`);
+            if (team === 'cubs') {
+                teamCounts.cubs++;
+            } else if (team === 'scouts') {
+                teamCounts.scouts++;
+            } else if (team === 'rovers') {
+                teamCounts.rovers++;
             }
         });
+
+        console.log('Team counts:', teamCounts);
 
         // Update dashboard statistics
         document.getElementById('totalScouts').textContent = teamCounts.total;
@@ -2721,11 +2775,17 @@ async function updateDashboardStats() {
         document.getElementById('dashboardScoutsCount').textContent = teamCounts.scouts;
         document.getElementById('dashboardRoversCount').textContent = teamCounts.rovers;
 
-        // Calculate weeks this year
-        const startOfYear = new Date(new Date().getFullYear(), 8, 1); // September 1st
+        // Calculate weeks this year (September to current date)
+        const currentYear = new Date().getFullYear();
+        const currentMonth = new Date().getMonth(); // 0-based (0 = January)
+
+        // If we're before September, use previous year's start
+        const yearStart = currentMonth >= 8 ? currentYear : currentYear - 1;
+        const startOfYear = new Date(yearStart, 8, 1); // September 1st
         const now = new Date();
+
         const weeksSoFar = Math.ceil((now - startOfYear) / (7 * 24 * 60 * 60 * 1000));
-        document.getElementById('weeksSoFar').textContent = Math.max(0, weeksSoFar);
+        document.getElementById('weeksSoFar').textContent = Math.max(1, weeksSoFar);
 
     } catch (error) {
         console.error('Error updating dashboard stats:', error);
