@@ -68,6 +68,10 @@
                     <i class="fas fa-bullhorn"></i>
                     <span>Announcements</span>
                 </li>
+                <li class="menu-item" data-section="gallery">
+                    <i class="fas fa-images"></i>
+                    <span>Photo Gallery</span>
+                </li>
                 <li class="menu-item" data-section="curriculum">
                     <i class="fas fa-book-open"></i>
                     <span>Curriculum</span>
@@ -354,6 +358,52 @@
 
                 <div class="announcements-grid" id="announcementsGrid">
                     <!-- Announcements will be populated here -->
+                </div>
+            </section>
+
+            <!-- Photo Gallery Section -->
+            <section id="gallerySection" class="content-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <h2>Photo Gallery Management</h2>
+                        <p>Upload and manage photos displayed on the website gallery</p>
+                    </div>
+                    <button class="add-btn" onclick="showAddPhotoModal()">
+                        <i class="fas fa-plus"></i>
+                        Upload Photo
+                    </button>
+                </div>
+
+                <div class="gallery-admin-controls">
+                    <div class="gallery-filter-controls">
+                        <select id="adminGalleryFilter" class="admin-filter-select" onchange="filterAdminGallery()">
+                            <option value="all">All Categories</option>
+                            <option value="cubs">Cubs & Brownies</option>
+                            <option value="scouts">Scouts</option>
+                            <option value="rovers">Rovers</option>
+                            <option value="events">Events</option>
+                            <option value="activities">Activities</option>
+                        </select>
+                        <div class="gallery-search">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="gallerySearchInput" placeholder="Search photos..." onkeyup="filterAdminGallery()">
+                        </div>
+                    </div>
+                    <div class="gallery-stats">
+                        <span class="stat-item">
+                            <strong id="totalPhotosCount">0</strong> photos
+                        </span>
+                        <span class="stat-item">
+                            <strong id="activePhotosCount">0</strong> active
+                        </span>
+                    </div>
+                </div>
+
+                <div class="admin-gallery-grid" id="adminGalleryGrid">
+                    <div class="gallery-loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading photos...</p>
+                    </div>
                 </div>
             </section>
 
@@ -736,6 +786,24 @@
                     <label>Content *</label>
                     <textarea name="content" required rows="5" placeholder="Enter announcement content" maxlength="500"></textarea>
                 </div>
+
+                <!-- Image Upload Section -->
+                <div class="form-group">
+                    <label>Add Images (Optional)</label>
+                    <div class="announcement-image-upload">
+                        <div class="upload-zone-small" id="announcementUploadZone">
+                            <div class="upload-icon-small">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <span>Click to add images</span>
+                            <input type="file" id="announcementImageInput" accept="image/*" multiple style="display: none;">
+                        </div>
+                        <div class="image-previews" id="announcementImagePreviews">
+                            <!-- Image previews will be added here -->
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-row">
                     <div class="form-group">
                         <label>Priority *</label>
@@ -758,6 +826,7 @@
                     <div id="announcementPreview" class="announcement-preview">
                         <div class="preview-title">Your announcement title will appear here</div>
                         <div class="preview-content">Your announcement content will appear here</div>
+                        <div class="preview-images" id="previewImages"></div>
                     </div>
                 </div>
                 <div class="modal-actions">
@@ -790,6 +859,24 @@
                     <label>Content *</label>
                     <textarea name="content" required rows="5" placeholder="Enter announcement content" maxlength="500"></textarea>
                 </div>
+
+                <!-- Edit Image Upload Section -->
+                <div class="form-group">
+                    <label>Images</label>
+                    <div class="announcement-image-upload">
+                        <div class="upload-zone-small" id="editAnnouncementUploadZone">
+                            <div class="upload-icon-small">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <span>Click to add images</span>
+                            <input type="file" id="editAnnouncementImageInput" accept="image/*" multiple style="display: none;">
+                        </div>
+                        <div class="image-previews" id="editAnnouncementImagePreviews">
+                            <!-- Current and new image previews will be added here -->
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-row">
                     <div class="form-group">
                         <label>Priority *</label>
@@ -1187,6 +1274,152 @@
         </div>
     </div>
 
+    <!-- Add Photo Modal -->
+    <div id="addPhotoModal" class="modal" style="display: none;">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Upload New Photo</h3>
+                <button class="close-btn" onclick="closeModal('addPhotoModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addPhotoForm" class="photo-form">
+                <div class="photo-upload-area">
+                    <div class="upload-zone" id="photoUploadZone">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <h4>Drop photo here or click to browse</h4>
+                        <p>Supports JPG, PNG, GIF up to 10MB</p>
+                        <input type="file" id="photoFileInput" accept="image/*" style="display: none;">
+                        <button type="button" class="browse-btn" onclick="document.getElementById('photoFileInput').click()">
+                            <i class="fas fa-folder-open"></i>
+                            Browse Files
+                        </button>
+                    </div>
+                    <div class="photo-preview" id="photoPreview" style="display: none;">
+                        <img id="previewImage" src="" alt="Preview">
+                        <button type="button" class="remove-photo-btn" onclick="removePhotoPreview()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Photo Title *</label>
+                        <input type="text" name="title" required maxlength="100" placeholder="e.g., Cubs Team Building Activity">
+                    </div>
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select name="category" required>
+                            <option value="">Select Category</option>
+                            <option value="cubs">Cubs & Brownies</option>
+                            <option value="scouts">Scouts</option>
+                            <option value="rovers">Rovers</option>
+                            <option value="events">Events</option>
+                            <option value="activities">Activities</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description" rows="3" maxlength="200" placeholder="Brief description of the photo"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Status *</label>
+                        <select name="active" required>
+                            <option value="true" selected>Active (Visible on website)</option>
+                            <option value="false">Draft (Hidden)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="upload-progress" id="uploadProgress" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <span class="progress-text" id="progressText">Uploading...</span>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="action-btn secondary" onclick="closeModal('addPhotoModal')">Cancel</button>
+                    <button type="submit" class="action-btn primary" id="uploadPhotoBtn">
+                        <i class="fas fa-upload"></i>
+                        Upload Photo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Photo Modal -->
+    <div id="editPhotoModal" class="modal" style="display: none;">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Edit Photo</h3>
+                <button class="close-btn" onclick="closeModal('editPhotoModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="editPhotoForm" class="photo-form">
+                <input type="hidden" name="photoId">
+
+                <div class="current-photo-display">
+                    <img id="editPhotoPreview" src="" alt="Current photo" class="current-photo">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Photo Title *</label>
+                        <input type="text" name="title" required maxlength="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select name="category" required>
+                            <option value="">Select Category</option>
+                            <option value="cubs">Cubs & Brownies</option>
+                            <option value="scouts">Scouts</option>
+                            <option value="rovers">Rovers</option>
+                            <option value="events">Events</option>
+                            <option value="activities">Activities</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description" rows="3" maxlength="200"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Status *</label>
+                        <select name="active" required>
+                            <option value="true">Active (Visible on website)</option>
+                            <option value="false">Draft (Hidden)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="action-btn tertiary" onclick="deletePhoto()">
+                        <i class="fas fa-trash"></i>
+                        Delete Photo
+                    </button>
+                    <button type="button" class="action-btn secondary" onclick="closeModal('editPhotoModal')">Cancel</button>
+                    <button type="submit" class="action-btn primary">
+                        <i class="fas fa-save"></i>
+                        Update Photo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Loading Spinner -->
     <div id="loadingSpinner" class="loading-spinner">
         <div class="spinner"></div>
@@ -1210,5 +1443,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <script src="admin-script-realtime.js"></script>
+    <script src="gallery-functions.js"></script>
+    <script src="announcement-images.js"></script>
 </body>
 </html>

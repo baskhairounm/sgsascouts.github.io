@@ -29,6 +29,22 @@
       }
     },
 
+    "announcements": {
+      ".indexOn": ["timestamp"],
+      "$announcementId": {
+        ".validate": "newData.hasChildren(['title', 'content', 'priority', 'active', 'timestamp']) && newData.child('title').isString() && newData.child('content').isString() && (newData.child('priority').val() == 'low' || newData.child('priority').val() == 'medium' || newData.child('priority').val() == 'high') && newData.child('active').isBoolean() && newData.child('timestamp').isNumber()"
+      }
+    },
+
+    "gallery": {
+      "photos": {
+        ".indexOn": ["uploadDate", "category"],
+        "$photoId": {
+          ".validate": "newData.hasChildren(['title', 'githubUrl', 'category', 'uploadDate', 'active']) && newData.child('title').isString() && newData.child('githubUrl').isString() && (newData.child('category').val() == 'cubs' || newData.child('category').val() == 'scouts' || newData.child('category').val() == 'rovers' || newData.child('category').val() == 'events' || newData.child('category').val() == 'activities') && newData.child('uploadDate').isNumber() && newData.child('active').isBoolean()"
+        }
+      }
+    },
+
     "settings": {
       ".validate": "auth != null && auth.token.email_verified == true"
     }

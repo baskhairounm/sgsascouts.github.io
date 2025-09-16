@@ -1086,6 +1086,9 @@ function displayAnnouncements(announcementsToShow) {
                 <div class="announcement-content">
                     <h3 class="announcement-title">${announcement.title}</h3>
                     <p class="announcement-text">${announcement.content}</p>
+                    ${announcement.images && announcement.images.length > 0 ? `
+                        <div class="announcement-images-container" id="announcement-images-${announcement.id}"></div>
+                    ` : ''}
                     <div class="announcement-footer">
                         <span class="announcement-date">Created: ${dateCreated}</span>
                         <span class="announcement-author">By: ${announcement.author}</span>
@@ -1094,12 +1097,28 @@ function displayAnnouncements(announcementsToShow) {
             </div>
         `;
     }).join('');
+
+    // Display images for each announcement after HTML is rendered
+    setTimeout(() => {
+        announcements.forEach(announcement => {
+            if (announcement.images && announcement.images.length > 0) {
+                const container = document.getElementById(`announcement-images-${announcement.id}`);
+                if (container && window.displayAnnouncementImages) {
+                    window.displayAnnouncementImages(announcement.images, container);
+                }
+            }
+        });
+    }, 100);
 }
 
 function showAddAnnouncementModal() {
     document.getElementById('addAnnouncementModal').style.display = 'flex';
     // Reset form
     document.getElementById('addAnnouncementForm').reset();
+    // Reset images
+    if (window.resetAnnouncementImages) {
+        window.resetAnnouncementImages();
+    }
     updateAnnouncementPreview('announcementPreview', '', '');
 }
 
@@ -1132,17 +1151,34 @@ async function handleAddAnnouncement(e) {
     showLoadingSpinner();
 
     const formData = new FormData(e.target);
-    const announcementData = {
-        title: formData.get('title'),
-        content: formData.get('content'),
-        priority: formData.get('priority'),
-        active: formData.get('active') === 'true',
-        timestamp: Date.now(),
-        author: currentUser.email,
-        dateCreated: new Date().toISOString().split('T')[0]
-    };
-
     try {
+        // Upload images if any are selected
+        let uploadedImages = [];
+        if (window.selectedAnnouncementImages && window.selectedAnnouncementImages.length > 0) {
+            showNotification('Uploading images...', 'info');
+            console.log('Uploading', window.selectedAnnouncementImages.length, 'images...');
+
+            // Check if upload function exists
+            if (typeof window.uploadAnnouncementImages === 'function') {
+                uploadedImages = await window.uploadAnnouncementImages(window.selectedAnnouncementImages);
+                console.log('Images uploaded successfully:', uploadedImages);
+            } else {
+                console.error('uploadAnnouncementImages function not found');
+                throw new Error('Image upload function not available');
+            }
+        }
+
+        const announcementData = {
+            title: formData.get('title'),
+            content: formData.get('content'),
+            priority: formData.get('priority'),
+            active: formData.get('active') === 'true',
+            timestamp: Date.now(),
+            author: currentUser.email,
+            dateCreated: new Date().toISOString().split('T')[0],
+            images: uploadedImages // Add images array
+        };
+
         const announcementsRef = database.ref('announcements');
         await announcementsRef.push(announcementData);
 
