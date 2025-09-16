@@ -133,6 +133,12 @@ function setupEventListeners() {
         addScoutForm.addEventListener('submit', handleAddScout);
     }
 
+    // Edit scout form
+    const editScoutForm = document.getElementById('editScoutForm');
+    if (editScoutForm) {
+        editScoutForm.addEventListener('submit', handleEditScout);
+    }
+
     // Add announcement forms
     const addAnnouncementForm = document.getElementById('addAnnouncementForm');
     if (addAnnouncementForm) {
@@ -429,6 +435,51 @@ async function handleAddScout(e) {
         hideLoadingSpinner();
         showNotification('Error adding scout', 'error');
         console.error('Error adding scout:', error);
+    }
+}
+
+async function handleEditScout(e) {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const scoutId = formData.get('scoutId');
+
+    const scoutData = {
+        firstName: formData.get('firstName'),
+        lastName: formData.get('lastName'),
+        grade: parseInt(formData.get('grade')),
+        birthDate: formData.get('birthDate') || null,
+        parentName: formData.get('parentName'),
+        parentEmail: formData.get('parentEmail') || null,
+        parentPhone: formData.get('parentPhone'),
+        emergencyContact: formData.get('emergencyContact') || null,
+        notes: formData.get('notes') || null,
+        team: formData.get('team'),
+        lastModified: new Date().toISOString(),
+        modifiedBy: currentUser.email || 'admin'
+    };
+
+    showLoadingSpinner();
+
+    try {
+        // Update scout data in database
+        await database.ref(`scouts/${scoutId}`).update(scoutData);
+
+        hideLoadingSpinner();
+        closeModal('editScoutModal');
+        showNotification('Scout updated successfully!', 'success');
+
+        // Refresh displays
+        loadScouts();
+        updateDashboardStats();
+
+        // Reset form
+        e.target.reset();
+
+    } catch (error) {
+        hideLoadingSpinner();
+        showNotification('Error updating scout: ' + error.message, 'error');
+        console.error('Error updating scout:', error);
     }
 }
 
@@ -2334,8 +2385,49 @@ function downloadCSV(csvContent, filename) {
 }
 
 // Global functions for HTML onclick events
-function editScout(scoutId) {
-    showNotification('Edit functionality coming soon!', 'info');
+async function editScout(scoutId) {
+    try {
+        showLoadingSpinner();
+
+        // Load scout data from database
+        const snapshot = await database.ref(`scouts/${scoutId}`).once('value');
+
+        if (!snapshot.exists()) {
+            showNotification('Scout not found!', 'error');
+            hideLoadingSpinner();
+            return;
+        }
+
+        const scout = snapshot.val();
+
+        // Populate the edit form
+        const form = document.getElementById('editScoutForm');
+        form.scoutId.value = scoutId;
+        form.firstName.value = scout.firstName || '';
+        form.lastName.value = scout.lastName || '';
+        form.grade.value = scout.grade || '';
+        form.birthDate.value = scout.birthDate || '';
+        form.parentName.value = scout.parentName || '';
+        form.parentEmail.value = scout.parentEmail || '';
+        form.parentPhone.value = scout.parentPhone || '';
+        form.emergencyContact.value = scout.emergencyContact || '';
+        form.notes.value = scout.notes || '';
+
+        // Update team dropdown based on grade
+        if (scout.grade) {
+            updateTeamFromGradeEdit(form.grade);
+        }
+
+        hideLoadingSpinner();
+
+        // Show the modal
+        document.getElementById('editScoutModal').style.display = 'flex';
+
+    } catch (error) {
+        hideLoadingSpinner();
+        console.error('Error loading scout for edit:', error);
+        showNotification('Error loading scout data: ' + error.message, 'error');
+    }
 }
 
 // ===== TEAM-BASED FUNCTIONALITY =====
@@ -2373,6 +2465,29 @@ function getGradeRange(teamCode) {
 
 // Update team field when grade is selected
 function updateTeamFromGrade(gradeSelect) {
+    const teamSelect = gradeSelect.closest('form').querySelector('select[name="team"]');
+    const grade = gradeSelect.value;
+
+    if (grade && teamSelect) {
+        const team = getTeamFromGrade(grade);
+        const teamName = getTeamName(team);
+
+        // Clear existing options
+        teamSelect.innerHTML = '';
+
+        // Add the assigned team option
+        const option = document.createElement('option');
+        option.value = team;
+        option.textContent = teamName;
+        option.selected = true;
+        teamSelect.appendChild(option);
+
+        // Update visual feedback
+        teamSelect.style.backgroundColor = '#e8f5e8';
+    }
+}
+
+function updateTeamFromGradeEdit(gradeSelect) {
     const teamSelect = gradeSelect.closest('form').querySelector('select[name="team"]');
     const grade = gradeSelect.value;
 
