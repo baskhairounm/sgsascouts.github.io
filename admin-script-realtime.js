@@ -252,6 +252,7 @@ function showSection(sectionName) {
         attendance: { title: 'Attendance Tracking', subtitle: 'Weekly attendance management' },
         announcements: { title: 'Announcements', subtitle: 'Manage announcements displayed on the main website' },
         curriculum: { title: 'Curriculum Management', subtitle: 'Manage weekly curriculum content and activities' },
+        yearOverview: { title: 'Year Overview', subtitle: 'SGSA Sea Scouts program structure and planning reference' },
         reports: { title: 'Reports & Analytics', subtitle: 'Generate and export attendance reports' },
         settings: { title: 'Admin Settings', subtitle: 'Manage admin preferences and system settings' }
     };
@@ -273,6 +274,9 @@ function showSection(sectionName) {
             break;
         case 'curriculum':
             loadCurriculum();
+            break;
+        case 'yearOverview':
+            // Year Overview section is static content, no data loading needed
             break;
         case 'reports':
             loadReportsData();

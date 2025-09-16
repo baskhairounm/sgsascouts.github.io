@@ -2643,3 +2643,413 @@ body {
         padding: 40px 20px;
     }
 }
+
+/* ===== YEAR OVERVIEW STYLES ===== */
+
+.year-overview-content {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding: 0 10px;
+}
+
+.overview-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    border: 1px solid rgba(44, 90, 160, 0.1);
+    transition: all 0.3s ease;
+}
+
+.overview-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.overview-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(44, 90, 160, 0.1);
+}
+
+.overview-header i {
+    color: #2c5aa0;
+    font-size: 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.overview-header h3 {
+    color: #2c5aa0;
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Program Structure Styles */
+.overview-details {
+    margin-bottom: 25px;
+}
+
+.detail-row {
+    display: flex;
+    margin-bottom: 12px;
+    align-items: center;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #555;
+    min-width: 140px;
+    margin-right: 15px;
+}
+
+.detail-value {
+    color: #333;
+    font-weight: 500;
+}
+
+.meeting-format h4 {
+    color: #2c5aa0;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.format-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.timeline-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+    border-radius: 10px;
+    border-left: 4px solid #2c5aa0;
+    transition: all 0.3s ease;
+}
+
+.timeline-item:hover {
+    background: linear-gradient(135deg, #f0f4ff 0%, #e8f0ff 100%);
+    transform: translateX(5px);
+}
+
+.timeline-item .time {
+    font-weight: 600;
+    color: #2c5aa0;
+    min-width: 90px;
+    margin-right: 15px;
+    font-size: 0.95rem;
+}
+
+.timeline-item .activity {
+    color: #555;
+    line-height: 1.4;
+}
+
+/* Monthly Themes Styles */
+.theme-description {
+    color: #666;
+    font-style: italic;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.themes-table {
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(44, 90, 160, 0.15);
+}
+
+.theme-row {
+    display: grid;
+    grid-template-columns: 120px 1fr 1.5fr;
+    gap: 20px;
+    padding: 18px 20px;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.theme-row.header {
+    background: linear-gradient(135deg, #2c5aa0 0%, #1e4080 100%);
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.theme-row:not(.header) {
+    background: white;
+    border-bottom: 1px solid rgba(44, 90, 160, 0.08);
+}
+
+.theme-row:not(.header):hover {
+    background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+}
+
+.theme-row:not(.header):last-child {
+    border-bottom: none;
+}
+
+.theme-month {
+    font-weight: 600;
+    color: #2c5aa0;
+}
+
+.theme-title {
+    font-weight: 600;
+    color: #333;
+}
+
+.theme-focus {
+    color: #666;
+    line-height: 1.4;
+}
+
+/* Sample Weekly Breakdown Styles */
+.monthly-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.month-section {
+    background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+    border-radius: 12px;
+    padding: 20px;
+    border-left: 4px solid #2c5aa0;
+}
+
+.month-section h4 {
+    color: #2c5aa0;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.week-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.week-list li {
+    padding: 12px 15px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    line-height: 1.5;
+    color: #555;
+    transition: all 0.3s ease;
+}
+
+.week-list li:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.week-list li strong {
+    color: #2c5aa0;
+    font-weight: 600;
+}
+
+/* Core Elements Styles */
+.core-elements {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.element-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(44, 90, 160, 0.1);
+    transition: all 0.3s ease;
+}
+
+.element-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #f0f4ff 0%, #e8f0ff 100%);
+}
+
+.element-icon {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.element-icon i {
+    font-size: 1.2rem;
+}
+
+.element-content h5 {
+    color: #2c5aa0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.element-content p {
+    color: #666;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Mobile Responsive Styles for Year Overview */
+@media (max-width: 768px) {
+    .year-overview-content {
+        padding: 0 5px;
+        gap: 20px;
+    }
+
+    .overview-card {
+        padding: 20px;
+        border-radius: 12px;
+    }
+
+    .overview-header {
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+    }
+
+    .overview-header h3 {
+        font-size: 1.2rem;
+    }
+
+    .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+        margin-bottom: 15px;
+    }
+
+    .detail-label {
+        min-width: auto;
+        margin-right: 0;
+        color: #2c5aa0;
+        font-size: 0.9rem;
+    }
+
+    .detail-value {
+        font-size: 0.95rem;
+    }
+
+    .timeline-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 15px;
+    }
+
+    .timeline-item .time {
+        min-width: auto;
+        margin-right: 0;
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .timeline-item .activity {
+        font-size: 0.9rem;
+    }
+
+    .themes-table {
+        border-radius: 8px;
+    }
+
+    .theme-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 15px;
+    }
+
+    .theme-row.header {
+        text-align: center;
+        font-size: 1.1rem;
+        padding: 20px 15px;
+    }
+
+    .theme-month, .theme-title, .theme-focus {
+        text-align: left;
+    }
+
+    .theme-month {
+        font-size: 1rem;
+        margin-bottom: 5px;
+    }
+
+    .theme-title {
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+    }
+
+    .theme-focus {
+        font-size: 0.9rem;
+    }
+
+    .month-section {
+        padding: 15px;
+        border-radius: 8px;
+    }
+
+    .month-section h4 {
+        font-size: 1.1rem;
+        margin-bottom: 12px;
+    }
+
+    .week-list li {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+
+    .core-elements {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .element-item {
+        padding: 15px;
+        gap: 12px;
+    }
+
+    .element-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .element-icon i {
+        font-size: 1.1rem;
+    }
+
+    .element-content h5 {
+        font-size: 1rem;
+        margin-bottom: 6px;
+    }
+
+    .element-content p {
+        font-size: 0.9rem;
+    }
+}
