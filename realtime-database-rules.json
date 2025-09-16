@@ -17,6 +17,16 @@
       }
     },
     
+    "curriculum": {
+      "$team": {
+        "$year": {
+          "$week": {
+            ".validate": "newData.hasChildren(['weekNumber', 'theme']) && newData.child('weekNumber').isNumber() && newData.child('theme').isString()"
+          }
+        }
+      }
+    },
+
     "settings": {
       ".validate": "auth != null && auth.token.email_verified == true"
     }

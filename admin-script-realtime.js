@@ -1172,7 +1172,8 @@ async function loadCurriculum() {
 
 async function loadProgramYears() {
     try {
-        const curriculumRef = database.ref('curriculum');
+        const team = document.getElementById('curriculumTeamSelect').value || 'scouts';
+        const curriculumRef = database.ref(`curriculum/${team}`);
         const snapshot = await curriculumRef.once('value');
 
         const yearSelect = document.getElementById('programYearSelect');
@@ -1208,7 +1209,8 @@ async function loadProgramYears() {
 
 async function initializeCurrentYear() {
     const currentYear = new Date().getFullYear();
-    const programYearRef = database.ref(`curriculum/${currentYear}`);
+    const team = document.getElementById('curriculumTeamSelect').value || 'scouts';
+    const programYearRef = database.ref(`curriculum/${team}/${currentYear}`);
 
     try {
         showLoadingSpinner();
@@ -1216,7 +1218,7 @@ async function initializeCurrentYear() {
         // Check if year already exists
         const snapshot = await programYearRef.once('value');
         if (snapshot.exists()) {
-            showNotification(`Program year ${currentYear}-${currentYear + 1} already exists!`, 'info');
+            showNotification(`Program year ${currentYear}-${currentYear + 1} already exists for ${getTeamName(team)}!`, 'info');
             hideLoadingSpinner();
             return;
         }
@@ -1290,7 +1292,8 @@ async function loadAllWeeksData() {
     if (!currentProgramYear) return;
 
     try {
-        const curriculumRef = database.ref(`curriculum/${currentProgramYear}`);
+        const team = document.getElementById('curriculumTeamSelect').value || 'scouts';
+        const curriculumRef = database.ref(`curriculum/${team}/${currentProgramYear}`);
         const snapshot = await curriculumRef.once('value');
 
         allWeeksData = {};
@@ -1314,7 +1317,8 @@ async function loadWeekData(weekNumber) {
     if (!currentProgramYear) return;
 
     try {
-        const weekRef = database.ref(`curriculum/${currentProgramYear}/week${weekNumber}`);
+        const team = document.getElementById('curriculumTeamSelect').value || 'scouts';
+        const weekRef = database.ref(`curriculum/${team}/${currentProgramYear}/week${weekNumber}`);
         const snapshot = await weekRef.once('value');
 
         currentWeekData = snapshot.exists() ? snapshot.val() : getDefaultWeekData(weekNumber);
@@ -1745,7 +1749,8 @@ async function handleEditCurriculum(e) {
     };
 
     try {
-        const weekRef = database.ref(`curriculum/${programYear}/week${weekNumber}`);
+        const team = document.getElementById('curriculumTeamSelect').value || 'scouts';
+        const weekRef = database.ref(`curriculum/${team}/${programYear}/week${weekNumber}`);
         await weekRef.set(curriculumData);
 
         hideLoadingSpinner();
@@ -1771,7 +1776,8 @@ async function copyFromPreviousWeek() {
     try {
         showLoadingSpinner();
 
-        const prevWeekRef = database.ref(`curriculum/${currentProgramYear}/week${currentWeekNumber - 1}`);
+        const team = document.getElementById('curriculumTeamSelect').value || 'scouts';
+        const prevWeekRef = database.ref(`curriculum/${team}/${currentProgramYear}/week${currentWeekNumber - 1}`);
         const snapshot = await prevWeekRef.once('value');
 
         if (!snapshot.exists()) {
@@ -1789,7 +1795,7 @@ async function copyFromPreviousWeek() {
             modifiedBy: currentUser.email
         };
 
-        const currentWeekRef = database.ref(`curriculum/${currentProgramYear}/week${currentWeekNumber}`);
+        const currentWeekRef = database.ref(`curriculum/${team}/${currentProgramYear}/week${currentWeekNumber}`);
         await currentWeekRef.set(newWeekData);
 
         hideLoadingSpinner();
@@ -2614,6 +2620,9 @@ async function loadCurriculumByTeam(team) {
 
         // Update program year options for this team
         populateProgramYearsForTeam(team);
+
+        // Reload program years for the selected team
+        await loadProgramYears();
 
         showNotification(`Loaded curriculum for ${getTeamName(team)}`, 'info');
     } catch (error) {
