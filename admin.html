@@ -112,7 +112,7 @@
             <!-- Dashboard Section -->
             <section id="dashboardSection" class="content-section active">
                 <div class="stats-grid">
-                    <div class="stat-card">
+                    <div class="stat-card total">
                         <div class="stat-icon">
                             <i class="fas fa-users"></i>
                         </div>
@@ -121,6 +121,36 @@
                             <p>Total Scouts</p>
                         </div>
                     </div>
+                    <div class="stat-card cubs">
+                        <div class="stat-icon">
+                            <i class="fas fa-baby"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="dashboardCubsCount">0</h3>
+                            <p>Cubs & Brownies</p>
+                        </div>
+                    </div>
+                    <div class="stat-card scouts">
+                        <div class="stat-icon">
+                            <i class="fas fa-child"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="dashboardScoutsCount">0</h3>
+                            <p>Scouts</p>
+                        </div>
+                    </div>
+                    <div class="stat-card rovers">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="dashboardRoversCount">0</h3>
+                            <p>Rovers</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="secondary-stats">
                     <div class="stat-card">
                         <div class="stat-icon">
                             <i class="fas fa-calendar-check"></i>
@@ -171,7 +201,7 @@
                 <div class="section-header">
                     <div class="section-title">
                         <h2>Scout Roster</h2>
-                        <p>Manage scout enrollment and information</p>
+                        <p>Manage scout enrollment and information by team</p>
                     </div>
                     <div class="section-actions">
                         <button class="add-btn secondary" onclick="showBulkImportModal()">
@@ -185,9 +215,49 @@
                     </div>
                 </div>
 
-                <div class="search-bar">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="scoutSearch" placeholder="Search scouts by name or grade..." onkeyup="filterScouts()">
+                <div class="team-controls">
+                    <div class="team-selector">
+                        <label for="teamFilter">Select Team:</label>
+                        <select id="teamFilter" class="team-select" onchange="filterScoutsByTeam()">
+                            <option value="all">All Teams</option>
+                            <option value="cubs">Cubs & Brownies (Grades 3-6)</option>
+                            <option value="scouts">Scouts (Grades 7-10)</option>
+                            <option value="rovers">Rovers (Grades 11+)</option>
+                        </select>
+                    </div>
+                    <div class="search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="scoutSearch" placeholder="Search scouts by name or grade..." onkeyup="filterScouts()">
+                    </div>
+                </div>
+
+                <div class="team-stats" id="teamStats">
+                    <div class="stat-row">
+                        <div class="team-stat-card" id="cubsStats">
+                            <div class="stat-icon cubs"><i class="fas fa-baby"></i></div>
+                            <div class="stat-content">
+                                <h4>Cubs & Brownies</h4>
+                                <span class="stat-number" id="cubsCount">0</span>
+                                <span class="stat-label">scouts</span>
+                            </div>
+                        </div>
+                        <div class="team-stat-card" id="scoutsStats">
+                            <div class="stat-icon scouts"><i class="fas fa-child"></i></div>
+                            <div class="stat-content">
+                                <h4>Scouts</h4>
+                                <span class="stat-number" id="scoutsCount">0</span>
+                                <span class="stat-label">scouts</span>
+                            </div>
+                        </div>
+                        <div class="team-stat-card" id="roversStats">
+                            <div class="stat-icon rovers"><i class="fas fa-user-graduate"></i></div>
+                            <div class="stat-content">
+                                <h4>Rovers</h4>
+                                <span class="stat-number" id="roversCount">0</span>
+                                <span class="stat-label">scouts</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="scouts-grid" id="scoutsGrid">
@@ -200,9 +270,14 @@
                 <div class="section-header">
                     <div class="section-title">
                         <h2>Attendance Tracking</h2>
-                        <p>Weekly attendance management</p>
+                        <p>Weekly attendance management by team</p>
                     </div>
                     <div class="attendance-controls">
+                        <select id="attendanceTeamFilter" class="team-select" onchange="loadAttendanceForTeam()">
+                            <option value="cubs">Cubs & Brownies (Grades 3-6)</option>
+                            <option value="scouts" selected>Scouts (Grades 7-10)</option>
+                            <option value="rovers">Rovers (Grades 11+)</option>
+                        </select>
                         <input type="date" id="attendanceDate" class="date-input">
                         <button class="load-attendance-btn" onclick="loadAttendance()">
                             <i class="fas fa-calendar-day"></i>
@@ -287,9 +362,14 @@
                 <div class="section-header">
                     <div class="section-title">
                         <h2>Curriculum Management</h2>
-                        <p>Manage weekly curriculum content and activities</p>
+                        <p>Manage weekly curriculum content and activities by team</p>
                     </div>
                     <div class="curriculum-controls">
+                        <select id="curriculumTeamSelect" class="team-select" onchange="loadCurriculumForTeam()">
+                            <option value="cubs">Cubs & Brownies (Grades 3-6)</option>
+                            <option value="scouts" selected>Scouts (Grades 7-10)</option>
+                            <option value="rovers">Rovers (Grades 11+)</option>
+                        </select>
                         <select id="programYearSelect" class="year-select">
                             <option value="">Select Program Year</option>
                         </select>
@@ -769,7 +849,7 @@
                         </div>
                         <div class="column-item required">
                             <span class="column-name">Grade</span>
-                            <span class="column-type">Required (7 or 8)</span>
+                            <span class="column-type">Required (3-12 or Post-Secondary)</span>
                         </div>
                         <div class="column-item">
                             <span class="column-name">Birth Date</span>
@@ -961,10 +1041,25 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Grade *</label>
-                        <select name="grade" required>
+                        <select name="grade" required onchange="updateTeamFromGrade(this)">
                             <option value="">Select Grade</option>
+                            <option value="3">Grade 3</option>
+                            <option value="4">Grade 4</option>
+                            <option value="5">Grade 5</option>
+                            <option value="6">Grade 6</option>
                             <option value="7">Grade 7</option>
                             <option value="8">Grade 8</option>
+                            <option value="9">Grade 9</option>
+                            <option value="10">Grade 10</option>
+                            <option value="11">Grade 11</option>
+                            <option value="12">Grade 12</option>
+                            <option value="post-secondary">Post-Secondary</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Team *</label>
+                        <select name="team" required readonly style="background-color: #f5f5f5;">
+                            <option value="">Auto-assigned based on grade</option>
                         </select>
                     </div>
                     <div class="form-group">

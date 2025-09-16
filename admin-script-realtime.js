@@ -478,126 +478,94 @@ function setDefaultDate() {
 
 async function loadAttendance() {
     const dateInput = document.getElementById('attendanceDate');
+    const teamFilter = document.getElementById('attendanceTeamFilter');
     const selectedDate = dateInput.value;
-    
+    const selectedTeam = teamFilter ? teamFilter.value : 'scouts';
+
     if (!selectedDate) {
         showNotification('Please select a date', 'error');
         return;
     }
-    
-    showLoadingSpinner();
-    
+
+    // Use the team-based loading function
     try {
-        // Load scouts if not already loaded
-        if (scouts.length === 0) {
-            await loadScouts();
-        }
-        
-        // Load attendance for this date
-        const attendanceRef = database.ref('attendance/' + selectedDate.replace(/-/g, '_'));
+        showLoadingSpinner();
+
+        // Load scouts for the specific team
+        const scoutsSnapshot = await database.ref('scouts').once('value');
+        const scouts = scoutsSnapshot.val() || {};
+
+        const teamScouts = Object.entries(scouts)
+            .map(([id, scout]) => ({
+                id,
+                ...scout,
+                team: scout.team || getTeamFromGrade(scout.grade)
+            }))
+            .filter(scout => scout.team === selectedTeam);
+
+        // Load attendance for this date and team
+        const attendanceRef = database.ref(`attendance/${selectedTeam}/${selectedDate.replace(/-/g, '_')}`);
         const snapshot = await attendanceRef.once('value');
-        
-        attendanceData = {};
+
+        const attendanceData = {};
         if (snapshot.exists()) {
-            attendanceData = snapshot.val() || {};
+            const data = snapshot.val() || {};
+            // Process attendance data for each scout
+            teamScouts.forEach(scout => {
+                if (data[scout.id]) {
+                    attendanceData[scout.id] = data[scout.id];
+                }
+            });
         }
-        
-        displayAttendanceSheet(selectedDate);
+
+        displayAttendanceSheet(teamScouts, selectedDate, selectedTeam);
         hideLoadingSpinner();
     } catch (error) {
         hideLoadingSpinner();
-        showNotification('Error loading attendance', 'error');
         console.error('Error loading attendance:', error);
+        showNotification('Error loading attendance: ' + error.message, 'error');
     }
 }
 
-function displayAttendanceSheet(date) {
-    const attendanceSheet = document.getElementById('attendanceSheet');
-    
-    if (scouts.length === 0) {
-        attendanceSheet.innerHTML = `
-            <div class="empty-state" style="text-align: center; padding: 40px; color: #666;">
-                <i class="fas fa-clipboard-check" style="font-size: 3rem; color: #ccc; margin-bottom: 15px; display: block;"></i>
-                <h3>No scouts enrolled</h3>
-                <p>Add scouts to the roster first!</p>
-            </div>
-        `;
-        return;
-    }
-    
-    attendanceSheet.innerHTML = `
-        <div class="attendance-header">
-            <div>Scout Name</div>
-            <div>Present</div>
-            <div>Absent</div>
-        </div>
-        ${scouts.map(scout => {
-            const attendance = attendanceData[scout.id];
-            const isPresent = attendance?.status === 'present';
-            const isAbsent = attendance?.status === 'absent';
-            
-            return `
-                <div class="attendance-row" data-scout-id="${scout.id}">
-                    <div class="scout-attendance-name">${scout.firstName} ${scout.lastName}</div>
-                    <div class="attendance-toggle">
-                        <div class="attendance-radio">
-                            <input type="radio" id="present_${scout.id}" name="attendance_${scout.id}" value="present" ${isPresent ? 'checked' : ''}>
-                            <label for="present_${scout.id}">
-                                <i class="fas fa-check-circle"></i>
-                                Present
-                            </label>
-                        </div>
-                    </div>
-                    <div class="attendance-toggle">
-                        <div class="attendance-radio absent">
-                            <input type="radio" id="absent_${scout.id}" name="attendance_${scout.id}" value="absent" ${isAbsent ? 'checked' : ''}>
-                            <label for="absent_${scout.id}">
-                                <i class="fas fa-times-circle"></i>
-                                Absent
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join('')}
-    `;
-}
+// Old displayAttendanceSheet function removed - now using team-based version
 
 async function saveAttendance() {
     const dateInput = document.getElementById('attendanceDate');
+    const teamFilter = document.getElementById('attendanceTeamFilter');
     const selectedDate = dateInput.value;
-    
+    const selectedTeam = teamFilter ? teamFilter.value : 'scouts';
+
     if (!selectedDate) {
         showNotification('Please select a date', 'error');
         return;
     }
-    
+
     showLoadingSpinner();
-    
+
     try {
-        const attendanceRows = document.querySelectorAll('.attendance-row');
+        const attendanceRows = document.querySelectorAll('.attendance-item');
         const attendanceRecord = {};
-        
+
         for (const row of attendanceRows) {
             const scoutId = row.dataset.scoutId;
             const radio = row.querySelector('input[type="radio"]:checked');
-            
+
             if (radio) {
                 attendanceRecord[scoutId] = {
                     status: radio.value,
                     timestamp: new Date().toISOString(),
-                    recordedBy: currentUser.email
+                    recordedBy: currentUser.email || 'admin'
                 };
             }
         }
-        
-        // Save to date-specific node
+
+        // Save to team and date-specific node
         const dateKey = selectedDate.replace(/-/g, '_');
-        await database.ref('attendance/' + dateKey).set(attendanceRecord);
-        
+        await database.ref(`attendance/${selectedTeam}/${dateKey}`).set(attendanceRecord);
+
         hideLoadingSpinner();
-        showNotification('Attendance saved successfully!', 'success');
-        loadDashboardData();
+        showNotification(`Attendance saved successfully for ${getTeamName(selectedTeam)}!`, 'success');
+        updateDashboardStats();
     } catch (error) {
         hideLoadingSpinner();
         showNotification('Error saving attendance', 'error');
@@ -2341,3 +2309,493 @@ function downloadCSV(csvContent, filename) {
 function editScout(scoutId) {
     showNotification('Edit functionality coming soon!', 'info');
 }
+
+// ===== TEAM-BASED FUNCTIONALITY =====
+
+// Team utility functions
+function getTeamFromGrade(grade) {
+    const gradeNum = parseInt(grade);
+    if (grade === 'post-secondary' || gradeNum >= 11) {
+        return 'rovers';
+    } else if (gradeNum >= 7 && gradeNum <= 10) {
+        return 'scouts';
+    } else if (gradeNum >= 3 && gradeNum <= 6) {
+        return 'cubs';
+    }
+    return 'unknown';
+}
+
+function getTeamName(teamCode) {
+    const teams = {
+        'cubs': 'Cubs & Brownies',
+        'scouts': 'Scouts',
+        'rovers': 'Rovers'
+    };
+    return teams[teamCode] || 'Unknown Team';
+}
+
+function getGradeRange(teamCode) {
+    const ranges = {
+        'cubs': '3-6',
+        'scouts': '7-10',
+        'rovers': '11+'
+    };
+    return ranges[teamCode] || '';
+}
+
+// Update team field when grade is selected
+function updateTeamFromGrade(gradeSelect) {
+    const teamSelect = gradeSelect.closest('form').querySelector('select[name="team"]');
+    const grade = gradeSelect.value;
+
+    if (grade && teamSelect) {
+        const team = getTeamFromGrade(grade);
+        const teamName = getTeamName(team);
+
+        // Clear existing options
+        teamSelect.innerHTML = '';
+
+        // Add the assigned team option
+        const option = document.createElement('option');
+        option.value = team;
+        option.textContent = teamName;
+        option.selected = true;
+        teamSelect.appendChild(option);
+
+        // Update visual feedback
+        teamSelect.style.backgroundColor = '#e8f5e8';
+        teamSelect.style.color = '#2d5016';
+    }
+}
+
+// Filter scouts by team
+function filterScoutsByTeam() {
+    const teamFilter = document.getElementById('teamFilter').value;
+    loadScoutsForTeam(teamFilter);
+}
+
+// Load scouts for specific team
+async function loadScoutsForTeam(teamFilter = 'all') {
+    try {
+        showLoadingSpinner();
+
+        const snapshot = await database.ref('scouts').once('value');
+        const scouts = snapshot.val() || {};
+
+        const scoutsArray = Object.entries(scouts).map(([id, scout]) => ({
+            id,
+            ...scout,
+            team: scout.team || getTeamFromGrade(scout.grade)
+        }));
+
+        // Filter by team if specified
+        let filteredScouts = scoutsArray;
+        if (teamFilter !== 'all') {
+            filteredScouts = scoutsArray.filter(scout => scout.team === teamFilter);
+        }
+
+        // Update team statistics
+        updateTeamStatistics(scoutsArray);
+
+        // Display scouts
+        displayScouts(filteredScouts);
+
+        hideLoadingSpinner();
+    } catch (error) {
+        hideLoadingSpinner();
+        console.error('Error loading scouts by team:', error);
+        showNotification('Error loading scouts: ' + error.message, 'error');
+    }
+}
+
+// Update team statistics display
+function updateTeamStatistics(scouts) {
+    const teamCounts = {
+        cubs: 0,
+        scouts: 0,
+        rovers: 0
+    };
+
+    scouts.forEach(scout => {
+        const team = scout.team || getTeamFromGrade(scout.grade);
+        if (teamCounts.hasOwnProperty(team)) {
+            teamCounts[team]++;
+        }
+    });
+
+    // Update UI
+    document.getElementById('cubsCount').textContent = teamCounts.cubs;
+    document.getElementById('scoutsCount').textContent = teamCounts.scouts;
+    document.getElementById('roversCount').textContent = teamCounts.rovers;
+
+    // Update active state
+    const teamFilter = document.getElementById('teamFilter').value;
+    document.querySelectorAll('.team-stat-card').forEach(card => {
+        card.classList.remove('active');
+    });
+
+    if (teamFilter !== 'all') {
+        const activeCard = document.getElementById(teamFilter + 'Stats');
+        if (activeCard) {
+            activeCard.classList.add('active');
+        }
+    }
+}
+
+// Enhanced display scouts function with team badges
+function displayScouts(scouts) {
+    const grid = document.getElementById('scoutsGrid');
+    if (!grid) return;
+
+    if (scouts.length === 0) {
+        grid.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-users"></i>
+                <h3>No Scouts Found</h3>
+                <p>No scouts match the current filter criteria.</p>
+            </div>
+        `;
+        return;
+    }
+
+    grid.innerHTML = scouts.map(scout => {
+        const team = scout.team || getTeamFromGrade(scout.grade);
+        const teamName = getTeamName(team);
+
+        return `
+            <div class="scout-card" data-team="${team}">
+                <div class="scout-header">
+                    <div class="scout-name">
+                        <h3>${scout.firstName} ${scout.lastName}</h3>
+                        <span class="team-badge ${team}">${teamName}</span>
+                    </div>
+                    <div class="scout-actions">
+                        <button class="action-btn small" onclick="editScout('${scout.id}')" title="Edit Scout">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn small danger" onclick="deleteScout('${scout.id}')" title="Delete Scout">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="scout-details">
+                    <div class="detail-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Grade ${scout.grade}</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-user"></i>
+                        <span>${scout.parentName}</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-phone"></i>
+                        <span>${scout.parentPhone}</span>
+                    </div>
+                    ${scout.parentEmail ? `
+                        <div class="detail-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>${scout.parentEmail}</span>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Load attendance for specific team
+function loadAttendanceForTeam() {
+    const team = document.getElementById('attendanceTeamFilter').value;
+    loadAttendanceByTeam(team);
+}
+
+async function loadAttendanceByTeam(team) {
+    try {
+        showLoadingSpinner();
+
+        // Load scouts for the specific team
+        const scoutsSnapshot = await database.ref('scouts').once('value');
+        const scouts = scoutsSnapshot.val() || {};
+
+        const teamScouts = Object.entries(scouts)
+            .map(([id, scout]) => ({
+                id,
+                ...scout,
+                team: scout.team || getTeamFromGrade(scout.grade)
+            }))
+            .filter(scout => scout.team === team);
+
+        // Get selected date
+        const dateInput = document.getElementById('attendanceDate');
+        const selectedDate = dateInput.value;
+
+        if (!selectedDate) {
+            // Set today's date as default
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.value = today;
+        }
+
+        displayAttendanceSheet(teamScouts, selectedDate || dateInput.value, team);
+
+        hideLoadingSpinner();
+    } catch (error) {
+        hideLoadingSpinner();
+        console.error('Error loading team attendance:', error);
+        showNotification('Error loading attendance: ' + error.message, 'error');
+    }
+}
+
+function displayAttendanceSheet(scouts, date, team) {
+    const sheet = document.getElementById('attendanceSheet');
+    if (!sheet) return;
+
+    if (scouts.length === 0) {
+        sheet.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-calendar-times"></i>
+                <h3>No Scouts in ${getTeamName(team)}</h3>
+                <p>Add scouts to this team to track attendance.</p>
+            </div>
+        `;
+        return;
+    }
+
+    const dateFormatted = new Date(date).toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+
+    sheet.innerHTML = `
+        <div class="attendance-header">
+            <h3>${getTeamName(team)} Attendance</h3>
+            <p>${dateFormatted}</p>
+        </div>
+        <div class="attendance-list">
+            ${scouts.map(scout => `
+                <div class="attendance-item" data-scout-id="${scout.id}">
+                    <div class="scout-info">
+                        <span class="scout-name">${scout.firstName} ${scout.lastName}</span>
+                        <span class="scout-grade">Grade ${scout.grade}</span>
+                    </div>
+                    <div class="attendance-controls">
+                        <label class="attendance-option">
+                            <input type="radio" name="attendance_${scout.id}" value="present">
+                            <span class="checkmark present">Present</span>
+                        </label>
+                        <label class="attendance-option">
+                            <input type="radio" name="attendance_${scout.id}" value="absent">
+                            <span class="checkmark absent">Absent</span>
+                        </label>
+                        <label class="attendance-option">
+                            <input type="radio" name="attendance_${scout.id}" value="excused">
+                            <span class="checkmark excused">Excused</span>
+                        </label>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+// Load curriculum for specific team
+function loadCurriculumForTeam() {
+    const team = document.getElementById('curriculumTeamSelect').value;
+    // Update curriculum loading to be team-specific
+    loadCurriculumByTeam(team);
+}
+
+async function loadCurriculumByTeam(team) {
+    try {
+        // Load team-specific curriculum
+        const snapshot = await database.ref(`curriculum/${team}`).once('value');
+        const curriculum = snapshot.val() || {};
+
+        // Update program year options for this team
+        populateProgramYearsForTeam(team);
+
+        showNotification(`Loaded curriculum for ${getTeamName(team)}`, 'info');
+    } catch (error) {
+        console.error('Error loading team curriculum:', error);
+        showNotification('Error loading curriculum: ' + error.message, 'error');
+    }
+}
+
+function populateProgramYearsForTeam(team) {
+    const select = document.getElementById('programYearSelect');
+    const currentYear = new Date().getFullYear();
+    const teamName = getTeamName(team);
+
+    select.innerHTML = `
+        <option value="">Select Program Year for ${teamName}</option>
+        <option value="${currentYear}-${currentYear + 1}">${currentYear}-${currentYear + 1}</option>
+        <option value="${currentYear - 1}-${currentYear}">${currentYear - 1}-${currentYear}</option>
+    `;
+}
+
+// Enhanced scout validation for team assignment
+function validateScoutData(scouts) {
+    const validScouts = [];
+    const errors = [];
+
+    scouts.forEach((scout, index) => {
+        const rowErrors = [];
+
+        // Validate required fields
+        if (!scout.firstName?.trim()) rowErrors.push('Missing first name');
+        if (!scout.lastName?.trim()) rowErrors.push('Missing last name');
+        if (!scout.grade) rowErrors.push('Missing grade');
+        if (!scout.parentName?.trim()) rowErrors.push('Missing parent name');
+        if (!scout.parentPhone?.trim()) rowErrors.push('Missing parent phone');
+
+        // Validate grade range
+        const validGrades = ['3', '4', '5', '6', '7', '8', '9', '10', '11', '12', 'post-secondary'];
+        if (scout.grade && !validGrades.includes(scout.grade.toString())) {
+            rowErrors.push('Invalid grade (must be 3-12 or Post-Secondary)');
+        }
+
+        // Auto-assign team based on grade
+        if (scout.grade) {
+            scout.team = getTeamFromGrade(scout.grade);
+        }
+
+        if (rowErrors.length === 0) {
+            validScouts.push(scout);
+        } else {
+            errors.push({
+                row: index + 1,
+                scout: scout,
+                errors: rowErrors
+            });
+        }
+    });
+
+    return { validScouts, errors };
+}
+
+// Override the original loadScouts function to include team functionality
+const originalLoadScouts = window.loadScouts;
+window.loadScouts = function() {
+    loadScoutsForTeam('all');
+};
+
+// Update dashboard with team statistics
+async function updateDashboardStats() {
+    try {
+        const snapshot = await database.ref('scouts').once('value');
+        const scouts = snapshot.val() || {};
+
+        const scoutsArray = Object.entries(scouts).map(([id, scout]) => ({
+            id,
+            ...scout,
+            team: scout.team || getTeamFromGrade(scout.grade)
+        }));
+
+        const teamCounts = {
+            cubs: 0,
+            scouts: 0,
+            rovers: 0,
+            total: scoutsArray.length
+        };
+
+        scoutsArray.forEach(scout => {
+            const team = scout.team || getTeamFromGrade(scout.grade);
+            if (teamCounts.hasOwnProperty(team)) {
+                teamCounts[team]++;
+            }
+        });
+
+        // Update dashboard statistics
+        document.getElementById('totalScouts').textContent = teamCounts.total;
+        document.getElementById('dashboardCubsCount').textContent = teamCounts.cubs;
+        document.getElementById('dashboardScoutsCount').textContent = teamCounts.scouts;
+        document.getElementById('dashboardRoversCount').textContent = teamCounts.rovers;
+
+        // Calculate weeks this year
+        const startOfYear = new Date(new Date().getFullYear(), 8, 1); // September 1st
+        const now = new Date();
+        const weeksSoFar = Math.ceil((now - startOfYear) / (7 * 24 * 60 * 60 * 1000));
+        document.getElementById('weeksSoFar').textContent = Math.max(0, weeksSoFar);
+
+    } catch (error) {
+        console.error('Error updating dashboard stats:', error);
+    }
+}
+
+// Enhanced add scout function with team assignment
+async function addScout(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+
+    const scoutData = {
+        firstName: formData.get('firstName').trim(),
+        lastName: formData.get('lastName').trim(),
+        grade: formData.get('grade'),
+        team: formData.get('team'),
+        birthDate: formData.get('birthDate') || '',
+        parentName: formData.get('parentName').trim(),
+        parentEmail: formData.get('parentEmail').trim(),
+        parentPhone: formData.get('parentPhone').trim(),
+        emergencyContact: formData.get('emergencyContact').trim(),
+        notes: formData.get('notes').trim()
+    };
+
+    try {
+        showLoadingSpinner();
+
+        // Auto-assign team if not already set
+        if (!scoutData.team && scoutData.grade) {
+            scoutData.team = getTeamFromGrade(scoutData.grade);
+        }
+
+        // Add to database
+        const newScoutRef = database.ref('scouts').push();
+        await newScoutRef.set({
+            ...scoutData,
+            dateAdded: new Date().toISOString(),
+            addedBy: currentUser.email || 'admin'
+        });
+
+        hideLoadingSpinner();
+        closeModal('addScoutModal');
+        form.reset();
+
+        showNotification(`Scout added successfully to ${getTeamName(scoutData.team)}!`, 'success');
+
+        // Reload scouts and update dashboard
+        loadScoutsForTeam('all');
+        updateDashboardStats();
+
+    } catch (error) {
+        hideLoadingSpinner();
+        console.error('Error adding scout:', error);
+        showNotification('Error adding scout: ' + error.message, 'error');
+    }
+}
+
+// Initialize team-based functionality on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Override form submission for add scout
+    const addScoutForm = document.getElementById('addScoutForm');
+    if (addScoutForm) {
+        addScoutForm.addEventListener('submit', addScout);
+    }
+
+    // Update dashboard stats when authenticated
+    if (currentUser) {
+        updateDashboardStats();
+    }
+});
+
+// Override dashboard section loading
+const originalShowSection = window.showSection;
+window.showSection = function(sectionName) {
+    originalShowSection(sectionName);
+
+    if (sectionName === 'dashboard') {
+        updateDashboardStats();
+    }
+};
