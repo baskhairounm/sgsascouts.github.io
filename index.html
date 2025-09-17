@@ -19,9 +19,8 @@
                 <ul class="nav-menu">
                     <li><a href="#home">Home</a></li>
                     <li><a href="#announcements-feed">Announcements</a></li>
-                    <li><a href="#teams">Our Teams</a></li>
+                    <li><a href="#calendar">Calendar</a></li>
                     <li><a href="#about">About</a></li>
-                    <li><a href="#program">Program</a></li>
                     <li><a href="#gallery">Gallery</a></li>
                     <li><a href="#join">Join Us</a></li>
                     <li><a href="admin.html" class="admin-link" title="Admin Dashboard">
@@ -71,88 +70,40 @@
             </div>
         </section>
 
-        <section id="teams" class="teams">
+
+        <section id="calendar" class="calendar-section">
             <div class="container">
-                <h2>Our Scout Teams</h2>
-                <p class="teams-intro">SGSA Sea Scouts offers age-appropriate programs for three distinct teams, each with their own adventures and learning opportunities.</p>
+                <h2>Scout Calendar & Events</h2>
+                <p class="calendar-intro">Stay up to date with all scout meetings, events, and activities. RSVP to let us know your attendance plans.</p>
 
-                <div class="teams-grid">
-                    <div class="team-card cubs">
-                        <div class="team-header">
-                            <div class="team-icon">
-                                <i class="fas fa-baby"></i>
-                            </div>
-                            <h3>Cubs & Brownies</h3>
-                            <span class="team-grades">Grades 3-6</span>
-                        </div>
-                        <div class="team-content">
-                            <p>Our youngest scouts begin their journey with fundamental skills, teamwork, and fun activities designed for elementary school students.</p>
-                            <div class="team-highlights">
-                                <h4>Focus Areas:</h4>
-                                <ul>
-                                    <li>Basic nautical skills</li>
-                                    <li>Team building games</li>
-                                    <li>Simple crafts and projects</li>
-                                    <li>Safety awareness</li>
-                                    <li>Environmental awareness</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="team-footer">
-                            <span class="team-age">Ages 8-11</span>
-                        </div>
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <button class="calendar-nav" id="prevMonth">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <h3 id="currentMonthYear">Loading...</h3>
+                        <button class="calendar-nav" id="nextMonth">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
                     </div>
 
-                    <div class="team-card scouts">
-                        <div class="team-header">
-                            <div class="team-icon">
-                                <i class="fas fa-child"></i>
-                            </div>
-                            <h3>Scouts</h3>
-                            <span class="team-grades">Grades 7-10</span>
-                        </div>
-                        <div class="team-content">
-                            <p>Middle and early high school students dive deeper into maritime skills, leadership development, and community service.</p>
-                            <div class="team-highlights">
-                                <h4>Focus Areas:</h4>
-                                <ul>
-                                    <li>Advanced seamanship</li>
-                                    <li>Navigation and compass skills</li>
-                                    <li>Leadership opportunities</li>
-                                    <li>Service projects</li>
-                                    <li>Outdoor adventures</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="team-footer">
-                            <span class="team-age">Ages 12-15</span>
-                        </div>
-                    </div>
+                    <div class="calendar-grid" id="calendarGrid">
+                        <div class="calendar-day-header">Sun</div>
+                        <div class="calendar-day-header">Mon</div>
+                        <div class="calendar-day-header">Tue</div>
+                        <div class="calendar-day-header">Wed</div>
+                        <div class="calendar-day-header">Thu</div>
+                        <div class="calendar-day-header">Fri</div>
+                        <div class="calendar-day-header">Sat</div>
 
-                    <div class="team-card rovers">
-                        <div class="team-header">
-                            <div class="team-icon">
-                                <i class="fas fa-user-graduate"></i>
-                            </div>
-                            <h3>Rovers</h3>
-                            <span class="team-grades">Grades 11+ & Post-Secondary</span>
-                        </div>
-                        <div class="team-content">
-                            <p>Our senior scouts take on advanced challenges, mentor younger members, and prepare for adult leadership roles.</p>
-                            <div class="team-highlights">
-                                <h4>Focus Areas:</h4>
-                                <ul>
-                                    <li>Advanced maritime skills</li>
-                                    <li>Mentoring younger scouts</li>
-                                    <li>Project leadership</li>
-                                    <li>Community engagement</li>
-                                    <li>Career preparation</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="team-footer">
-                            <span class="team-age">Ages 16+</span>
-                        </div>
+                        <!-- Calendar days will be populated by JavaScript directly here -->
+                    </div>
+                </div>
+
+                <div class="upcoming-events">
+                    <h3>Upcoming Events</h3>
+                    <div id="upcomingEventsList" class="events-list">
+                        <!-- Events will be populated by JavaScript -->
                     </div>
                 </div>
             </div>
@@ -252,105 +203,190 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
 
-        <section id="program" class="program">
-            <div class="container">
-                <h2>Monthly Themes</h2>
-                <div class="themes-grid">
-                    <div class="theme-card">
-                        <h3>September</h3>
-                        <h4>Team Building & Leadership</h4>
-                        <p>Patrol formation, knots refresher, communication games</p>
+                <!-- Our Scout Teams Section -->
+                <div class="teams-section">
+                    <h2>Our Scout Teams</h2>
+                    <p class="teams-intro">SGSA Sea Scouts offers age-appropriate programs for three distinct teams, each with their own adventures and learning opportunities.</p>
+
+                    <div class="teams-grid">
+                        <div class="team-card cubs">
+                            <div class="team-header">
+                                <div class="team-icon">
+                                    <i class="fas fa-baby"></i>
+                                </div>
+                                <h3>Cubs & Brownies</h3>
+                                <span class="team-grades">Grades 3-6</span>
+                            </div>
+                            <div class="team-content">
+                                <p>Our youngest scouts begin their journey with fundamental skills, teamwork, and fun activities designed for elementary school students.</p>
+                                <div class="team-highlights">
+                                    <h4>Focus Areas:</h4>
+                                    <ul>
+                                        <li>Basic nautical skills</li>
+                                        <li>Team building games</li>
+                                        <li>Simple crafts and projects</li>
+                                        <li>Safety awareness</li>
+                                        <li>Environmental awareness</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="team-footer">
+                                <span class="team-age">Ages 8-11</span>
+                            </div>
+                        </div>
+
+                        <div class="team-card scouts">
+                            <div class="team-header">
+                                <div class="team-icon">
+                                    <i class="fas fa-child"></i>
+                                </div>
+                                <h3>Scouts</h3>
+                                <span class="team-grades">Grades 7-10</span>
+                            </div>
+                            <div class="team-content">
+                                <p>Middle and early high school students dive deeper into maritime skills, leadership development, and community service.</p>
+                                <div class="team-highlights">
+                                    <h4>Focus Areas:</h4>
+                                    <ul>
+                                        <li>Advanced seamanship</li>
+                                        <li>Navigation and compass skills</li>
+                                        <li>Leadership opportunities</li>
+                                        <li>Service projects</li>
+                                        <li>Outdoor adventures</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="team-footer">
+                                <span class="team-age">Ages 12-15</span>
+                            </div>
+                        </div>
+
+                        <div class="team-card rovers">
+                            <div class="team-header">
+                                <div class="team-icon">
+                                    <i class="fas fa-user-graduate"></i>
+                                </div>
+                                <h3>Rovers</h3>
+                                <span class="team-grades">Grades 11+ & Post-Secondary</span>
+                            </div>
+                            <div class="team-content">
+                                <p>Our senior scouts take on advanced challenges, mentor younger members, and prepare for adult leadership roles.</p>
+                                <div class="team-highlights">
+                                    <h4>Focus Areas:</h4>
+                                    <ul>
+                                        <li>Advanced maritime skills</li>
+                                        <li>Mentoring younger scouts</li>
+                                        <li>Project leadership</li>
+                                        <li>Community engagement</li>
+                                        <li>Career preparation</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="team-footer">
+                                <span class="team-age">Ages 16+</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="theme-card">
-                        <h3>October</h3>
-                        <h4>Seamanship Basics</h4>
-                        <p>Navigation, signals, first aid on the water</p>
+                </div>
+
+                <!-- Monthly Themes Section -->
+                <div class="program-section">
+                    <h2>Monthly Themes</h2>
+                    <div class="themes-grid">
+                        <div class="theme-card">
+                            <h3>September</h3>
+                            <h4>Team Building & Leadership</h4>
+                            <p>Patrol formation, knots refresher, communication games</p>
+                        </div>
+                        <div class="theme-card">
+                            <h3>October</h3>
+                            <h4>Seamanship Basics</h4>
+                            <p>Navigation, signals, first aid on the water</p>
+                        </div>
+                        <div class="theme-card">
+                            <h3>November</h3>
+                            <h4>Environment & Conservation</h4>
+                            <p>Water stewardship, shoreline cleanup planning</p>
+                        </div>
+                        <div class="theme-card">
+                            <h3>December</h3>
+                            <h4>Holiday Service Project</h4>
+                            <p>Build community gifts, winter safety on water</p>
+                        </div>
+                        <div class="theme-card">
+                            <h3>January</h3>
+                            <h4>Survival & Outdoor Skills</h4>
+                            <p>Cold-weather prep, shelter building, compass & map skills</p>
+                        </div>
+                        <div class="theme-card">
+                            <h3>February</h3>
+                            <h4>Citizenship & Service</h4>
+                            <p>Leadership challenges, volunteer project planning</p>
+                        </div>
+                        <div class="theme-card">
+                            <h3>March</h3>
+                            <h4>Nautical Engineering Fun</h4>
+                            <p>Build model boats, buoyancy experiments, gear maintenance</p>
+                        </div>
+                        <div class="theme-card">
+                            <h3>April</h3>
+                            <h4>Ceremonies & Awards</h4>
+                            <p>Skills review, personal badge progress, service wrap-up</p>
+                        </div>
+                        <div class="theme-card">
+                            <h3>May-June</h3>
+                            <h4>Major Project</h4>
+                            <p>Practice for end-of-year camp/boating day</p>
+                        </div>
                     </div>
-                    <div class="theme-card">
-                        <h3>November</h3>
-                        <h4>Environment & Conservation</h4>
-                        <p>Water stewardship, shoreline cleanup planning</p>
-                    </div>
-                    <div class="theme-card">
-                        <h3>December</h3>
-                        <h4>Holiday Service Project</h4>
-                        <p>Build community gifts, winter safety on water</p>
-                    </div>
-                    <div class="theme-card">
-                        <h3>January</h3>
-                        <h4>Survival & Outdoor Skills</h4>
-                        <p>Cold-weather prep, shelter building, compass & map skills</p>
-                    </div>
-                    <div class="theme-card">
-                        <h3>February</h3>
-                        <h4>Citizenship & Service</h4>
-                        <p>Leadership challenges, volunteer project planning</p>
-                    </div>
-                    <div class="theme-card">
-                        <h3>March</h3>
-                        <h4>Nautical Engineering Fun</h4>
-                        <p>Build model boats, buoyancy experiments, gear maintenance</p>
-                    </div>
-                    <div class="theme-card">
-                        <h3>April</h3>
-                        <h4>Ceremonies & Awards</h4>
-                        <p>Skills review, personal badge progress, service wrap-up</p>
-                    </div>
-                    <div class="theme-card">
-                        <h3>May-June</h3>
-                        <h4>Major Project</h4>
-                        <p>Practice for end-of-year camp/boating day</p>
+                </div>
+
+                <!-- Sample Activities Section -->
+                <div class="activities-section">
+                    <h2>Sample Activities</h2>
+                    <div class="activities-grid">
+                        <div class="activity-card">
+                            <h3>Hands-On Learning</h3>
+                            <ul>
+                                <li>Knot relay races</li>
+                                <li>Compass treasure hunts</li>
+                                <li>Model boat building</li>
+                                <li>Navigation challenges</li>
+                            </ul>
+                        </div>
+                        <div class="activity-card">
+                            <h3>Leadership Development</h3>
+                            <ul>
+                                <li>Role-playing scenarios</li>
+                                <li>Team building games</li>
+                                <li>Scout-led activities</li>
+                                <li>Communication workshops</li>
+                            </ul>
+                        </div>
+                        <div class="activity-card">
+                            <h3>Community Service</h3>
+                            <ul>
+                                <li>Shoreline cleanup planning</li>
+                                <li>Holiday service projects</li>
+                                <li>Environmental conservation</li>
+                                <li>Volunteer project planning</li>
+                            </ul>
+                        </div>
+                        <div class="activity-card">
+                            <h3>Safety & Skills</h3>
+                            <ul>
+                                <li>First aid scenarios</li>
+                                <li>Lifejacket drills</li>
+                                <li>Winter survival challenges</li>
+                                <li>Fire safety demonstrations</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="activities" class="activities">
-            <div class="container">
-                <h2>Sample Activities</h2>
-                <div class="activities-grid">
-                    <div class="activity-card">
-                        <h3>Hands-On Learning</h3>
-                        <ul>
-                            <li>Knot relay races</li>
-                            <li>Compass treasure hunts</li>
-                            <li>Model boat building</li>
-                            <li>Navigation challenges</li>
-                        </ul>
-                    </div>
-                    <div class="activity-card">
-                        <h3>Leadership Development</h3>
-                        <ul>
-                            <li>Role-playing scenarios</li>
-                            <li>Team building games</li>
-                            <li>Scout-led activities</li>
-                            <li>Communication workshops</li>
-                        </ul>
-                    </div>
-                    <div class="activity-card">
-                        <h3>Community Service</h3>
-                        <ul>
-                            <li>Shoreline cleanup planning</li>
-                            <li>Holiday service projects</li>
-                            <li>Environmental conservation</li>
-                            <li>Volunteer project planning</li>
-                        </ul>
-                    </div>
-                    <div class="activity-card">
-                        <h3>Safety & Skills</h3>
-                        <ul>
-                            <li>First aid scenarios</li>
-                            <li>Lifejacket drills</li>
-                            <li>Winter survival challenges</li>
-                            <li>Fire safety demonstrations</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
 
         <section id="gallery" class="gallery">
             <div class="container">
@@ -434,6 +470,99 @@
         </section>
     </main>
 
+    <!-- RSVP Modal -->
+    <div id="rsvpModal" class="modal" style="display: none;">
+        <div class="modal-content rsvp-modal-content">
+            <div class="modal-header">
+                <h3 id="rsvpEventTitle">Event RSVP</h3>
+                <button class="modal-close" onclick="closeRSVPModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="event-details">
+                    <div class="event-info">
+                        <h4 id="rsvpEventName">Event Name</h4>
+                        <p id="rsvpEventDate">Date & Time</p>
+                        <p id="rsvpEventDescription">Event Description</p>
+                    </div>
+                </div>
+
+                <form id="rsvpForm" class="rsvp-form">
+                    <div class="form-group">
+                        <label for="parentName">Parent/Guardian Name:</label>
+                        <input type="text" id="parentName" name="parentName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="parentEmail">Contact Email:</label>
+                        <input type="email" id="parentEmail" name="parentEmail" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="scoutTeam">Scout Team:</label>
+                        <select id="scoutTeam" name="scoutTeam" required>
+                            <option value="">Select Team</option>
+                            <option value="cubs">Cubs & Brownies (Grades 3-6)</option>
+                            <option value="scouts">Scouts (Grades 7-10)</option>
+                            <option value="rovers">Rovers (Grades 11+)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Scout Name:</label>
+                        <div class="name-input-group">
+                            <div class="name-field">
+                                <label for="scoutFirstName">First Name *</label>
+                                <input type="text" id="scoutFirstName" name="scoutFirstName" required placeholder="Enter first name" autocomplete="given-name">
+                            </div>
+                            <div class="name-field">
+                                <label for="scoutLastName">Last Name *</label>
+                                <input type="text" id="scoutLastName" name="scoutLastName" required placeholder="Enter last name" autocomplete="family-name">
+                            </div>
+                        </div>
+                        <small>Enter the scout's full name</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="attendanceStatus">Attendance Status:</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="attendanceStatus" value="attending" checked>
+                                <span class="radio-custom"></span>
+                                Will Attend
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="attendanceStatus" value="not-attending">
+                                <span class="radio-custom"></span>
+                                Cannot Attend
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="reasonGroup" style="display: none;">
+                        <label for="absentReason">Reason for Absence (Optional):</label>
+                        <textarea id="absentReason" name="absentReason" placeholder="Let us know why your scout cannot attend (optional)"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="additionalNotes">Additional Notes (Optional):</label>
+                        <textarea id="additionalNotes" name="additionalNotes" placeholder="Any special notes or questions"></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="closeRSVPModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-check"></i>
+                            Submit RSVP
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <footer>
         <div class="container">
             <div class="footer-content">
@@ -455,20 +584,8 @@
 
     <!-- Meeting Tracker JavaScript -->
     <script>
-        // Meeting configuration
-        const MEETING_CONFIG = {
-            day: 2, // Tuesday (0 = Sunday, 1 = Monday, 2 = Tuesday, etc.)
-            hour: 18, // 6 PM
-            minute: 15, // 6:15 PM
-            programStart: new Date(new Date().getFullYear(), 8, 3), // First Tuesday of September
-            programEnd: new Date(new Date().getFullYear() + 1, 5, 30), // End of June
-            holidays: [
-                // Add holiday dates when meetings are cancelled
-                new Date(2024, 11, 24), // Christmas week
-                new Date(2024, 11, 31), // New Year's week
-                // Add more holidays as needed
-            ]
-        };
+        // Meeting configuration is now loaded from config.js
+        // Use window.MEETING_CONFIG to access it
 
         // Monthly themes from the program overview
         const MONTHLY_THEMES = {
@@ -493,12 +610,12 @@
             let nextMeeting = new Date(today);
             
             // Find the next Tuesday
-            while (nextMeeting.getDay() !== MEETING_CONFIG.day) {
+            while (nextMeeting.getDay() !== window.MEETING_CONFIG.day) {
                 nextMeeting.setDate(nextMeeting.getDate() + 1);
             }
             
             // Set the meeting time
-            nextMeeting.setHours(MEETING_CONFIG.hour, MEETING_CONFIG.minute, 0, 0);
+            nextMeeting.setHours(window.MEETING_CONFIG.hour, window.MEETING_CONFIG.minute, 0, 0);
             
             // If today is Tuesday but the meeting time has passed, get next Tuesday
             if (nextMeeting <= now) {
@@ -506,14 +623,14 @@
             }
             
             // Check if it's during the program period
-            if (nextMeeting < MEETING_CONFIG.programStart || nextMeeting > MEETING_CONFIG.programEnd) {
+            if (nextMeeting < window.MEETING_CONFIG.programStart || nextMeeting > window.MEETING_CONFIG.programEnd) {
                 return null; // No meetings during break
             }
             
             // Check for holidays
             while (isHoliday(nextMeeting)) {
                 nextMeeting.setDate(nextMeeting.getDate() + 7);
-                if (nextMeeting > MEETING_CONFIG.programEnd) {
+                if (nextMeeting > window.MEETING_CONFIG.programEnd) {
                     return null;
                 }
             }
@@ -522,7 +639,7 @@
         }
         
         function isHoliday(date) {
-            return MEETING_CONFIG.holidays.some(holiday => 
+            return window.MEETING_CONFIG.holidays.some(holiday => 
                 holiday.getTime() === date.getTime()
             );
         }
@@ -530,13 +647,13 @@
         // Calculate current program week
         function getCurrentWeek() {
             const now = new Date();
-            const programStart = MEETING_CONFIG.programStart;
+            const programStart = window.MEETING_CONFIG.programStart;
             
             if (now < programStart) {
                 return { week: 0, status: "Program hasn't started yet" };
             }
             
-            if (now > MEETING_CONFIG.programEnd) {
+            if (now > window.MEETING_CONFIG.programEnd) {
                 return { week: 0, status: "Program has ended for the year" };
             }
             
@@ -938,6 +1055,8 @@
             }
         }
     </script>
+    <script src="config.js"></script>
     <script src="announcement-images.js"></script>
+    <script src="calendar.js"></script>
 </body>
 </html>

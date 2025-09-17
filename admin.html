@@ -68,6 +68,10 @@
                     <i class="fas fa-bullhorn"></i>
                     <span>Announcements</span>
                 </li>
+                <li class="menu-item" data-section="calendar">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Calendar & Events</span>
+                </li>
                 <li class="menu-item" data-section="gallery">
                     <i class="fas fa-images"></i>
                     <span>Photo Gallery</span>
@@ -358,6 +362,99 @@
 
                 <div class="announcements-grid" id="announcementsGrid">
                     <!-- Announcements will be populated here -->
+                </div>
+            </section>
+
+            <!-- Calendar & Events Section -->
+            <section id="calendarSection" class="content-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <h2>Calendar & Events</h2>
+                        <p>Manage events and view RSVP responses</p>
+                    </div>
+                    <button class="add-btn" onclick="showAddEventModal()">
+                        <i class="fas fa-plus"></i>
+                        Add Event
+                    </button>
+                </div>
+
+                <div class="calendar-admin-tabs">
+                    <button class="tab-btn active" data-tab="events">
+                        <i class="fas fa-calendar-plus"></i>
+                        Manage Events
+                    </button>
+                    <button class="tab-btn" data-tab="rsvps">
+                        <i class="fas fa-users"></i>
+                        View RSVPs
+                    </button>
+                </div>
+
+                <!-- Events Management Tab -->
+                <div id="eventsTab" class="tab-content active">
+                    <div class="events-controls">
+                        <div class="filter-controls">
+                            <select id="eventTypeFilter" class="admin-filter-select" onchange="filterAdminEvents()">
+                                <option value="all">All Types</option>
+                                <option value="meeting">Meetings</option>
+                                <option value="event">Events</option>
+                                <option value="special">Special Events</option>
+                            </select>
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="eventSearchInput" placeholder="Search events..." onkeyup="filterAdminEvents()">
+                            </div>
+                        </div>
+                        <div class="events-stats">
+                            <span class="stat-item">
+                                <strong id="totalEventsCount">0</strong> events
+                            </span>
+                            <span class="stat-item">
+                                <strong id="upcomingEventsCount">0</strong> upcoming
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="events-grid" id="eventsGrid">
+                        <!-- Events will be populated here -->
+                    </div>
+                </div>
+
+                <!-- RSVPs Tab -->
+                <div id="rsvpsTab" class="tab-content">
+                    <div class="rsvp-controls">
+                        <div class="filter-controls">
+                            <select id="rsvpEventFilter" class="admin-filter-select" onchange="filterRSVPs()">
+                                <option value="all">All Events</option>
+                                <!-- Will be populated with events -->
+                            </select>
+                            <select id="rsvpStatusFilter" class="admin-filter-select" onchange="filterRSVPs()">
+                                <option value="all">All Statuses</option>
+                                <option value="attending">Attending</option>
+                                <option value="not-attending">Not Attending</option>
+                            </select>
+                            <select id="rsvpTeamFilter" class="admin-filter-select" onchange="filterRSVPs()">
+                                <option value="all">All Teams</option>
+                                <option value="cubs">Cubs & Brownies</option>
+                                <option value="scouts">Scouts</option>
+                                <option value="rovers">Rovers</option>
+                            </select>
+                        </div>
+                        <div class="rsvp-stats">
+                            <span class="stat-item">
+                                <strong id="totalRSVPsCount">0</strong> responses
+                            </span>
+                            <span class="stat-item">
+                                <strong id="attendingCount">0</strong> attending
+                            </span>
+                            <span class="stat-item">
+                                <strong id="notAttendingCount">0</strong> not attending
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="rsvp-list" id="rsvpList">
+                        <!-- RSVPs will be populated here -->
+                    </div>
                 </div>
             </section>
 
@@ -1434,6 +1531,271 @@
         </div>
     </div>
 
+    <!-- Add Event Modal -->
+    <div id="addEventModal" class="modal" style="display: none;">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Add New Event</h3>
+                <button class="close-btn" onclick="closeModal('addEventModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addEventForm" class="event-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Event Title *</label>
+                        <input type="text" name="title" required maxlength="100" placeholder="Scout Activity, Special Event, etc.">
+                    </div>
+                    <div class="form-group">
+                        <label>Event Type *</label>
+                        <select name="type" required>
+                            <option value="">Select Type</option>
+                            <option value="event">Regular Event</option>
+                            <option value="special">Special Event</option>
+                            <option value="meeting">Meeting (Custom)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Event Date *</label>
+                        <input type="date" name="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Start Time</label>
+                        <input type="time" name="startTime" placeholder="18:15">
+                    </div>
+                    <div class="form-group">
+                        <label>End Time</label>
+                        <input type="time" name="endTime" placeholder="19:45">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Event Description</label>
+                    <textarea name="description" rows="4" maxlength="500" placeholder="Describe the event, what to bring, special instructions, etc."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" name="location" maxlength="100" placeholder="Regular meeting location">
+                    </div>
+                    <div class="form-group">
+                        <label>Teams Invited</label>
+                        <select name="teamsInvited" multiple>
+                            <option value="cubs">Cubs & Brownies</option>
+                            <option value="scouts">Scouts</option>
+                            <option value="rovers">Rovers</option>
+                        </select>
+                        <small>Hold Ctrl/Cmd to select multiple teams</small>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>RSVP Required?</label>
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="rsvpRequired" value="true" checked>
+                                Yes, RSVP required
+                            </label>
+                            <label>
+                                <input type="radio" name="rsvpRequired" value="false">
+                                No RSVP needed
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Event Status</label>
+                        <select name="status">
+                            <option value="active" selected>Active</option>
+                            <option value="cancelled">Cancelled</option>
+                            <option value="postponed">Postponed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Recurring Event Settings -->
+                <div class="form-section">
+                    <h4>Recurring Event Settings</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Repeat Event?</label>
+                            <div class="radio-group">
+                                <label>
+                                    <input type="radio" name="recurring" value="false" checked onchange="toggleRecurringOptions(false)">
+                                    One-time event
+                                </label>
+                                <label>
+                                    <input type="radio" name="recurring" value="true" onchange="toggleRecurringOptions(true)">
+                                    Repeating event
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="recurringOptions" class="recurring-options" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Repeat Every *</label>
+                                <select name="repeatInterval" id="repeatInterval" disabled>
+                                    <option value="weekly">Week</option>
+                                    <option value="biweekly">2 Weeks</option>
+                                    <option value="monthly">Month</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>On Day(s) *</label>
+                                <select name="repeatDay" id="repeatDay" disabled>
+                                    <option value="0">Sunday</option>
+                                    <option value="1">Monday</option>
+                                    <option value="2" selected>Tuesday</option>
+                                    <option value="3">Wednesday</option>
+                                    <option value="4">Thursday</option>
+                                    <option value="5">Friday</option>
+                                    <option value="6">Saturday</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Repeat Until *</label>
+                                <input type="date" name="repeatUntil" id="repeatUntil" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label>Skip Holidays?</label>
+                                <div class="radio-group">
+                                    <label>
+                                        <input type="radio" name="skipHolidays" value="true" checked>
+                                        Yes, skip holidays
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="skipHolidays" value="false">
+                                        No, include holidays
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Holiday Dates to Skip</label>
+                            <textarea name="holidayDates" rows="3" placeholder="Enter dates to skip (one per line): 2025-12-25, 2025-01-01, etc."></textarea>
+                            <small>Format: YYYY-MM-DD, one date per line</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="action-btn secondary" onclick="closeModal('addEventModal')">Cancel</button>
+                    <button type="submit" class="action-btn primary">
+                        <i class="fas fa-plus"></i>
+                        Add Event
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Event Modal -->
+    <div id="editEventModal" class="modal" style="display: none;">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Edit Event</h3>
+                <button class="close-btn" onclick="closeModal('editEventModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="editEventForm" class="event-form">
+                <input type="hidden" name="eventId">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Event Title *</label>
+                        <input type="text" name="title" required maxlength="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Event Type *</label>
+                        <select name="type" required>
+                            <option value="event">Regular Event</option>
+                            <option value="special">Special Event</option>
+                            <option value="meeting">Meeting (Custom)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Event Date *</label>
+                        <input type="date" name="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Start Time</label>
+                        <input type="time" name="startTime">
+                    </div>
+                    <div class="form-group">
+                        <label>End Time</label>
+                        <input type="time" name="endTime">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Event Description</label>
+                    <textarea name="description" rows="4" maxlength="500"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" name="location" maxlength="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Teams Invited</label>
+                        <select name="teamsInvited" multiple>
+                            <option value="cubs">Cubs & Brownies</option>
+                            <option value="scouts">Scouts</option>
+                            <option value="rovers">Rovers</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>RSVP Required?</label>
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="rsvpRequired" value="true">
+                                Yes, RSVP required
+                            </label>
+                            <label>
+                                <input type="radio" name="rsvpRequired" value="false">
+                                No RSVP needed
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Event Status</label>
+                        <select name="status">
+                            <option value="active">Active</option>
+                            <option value="cancelled">Cancelled</option>
+                            <option value="postponed">Postponed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="action-btn secondary" onclick="closeModal('editEventModal')">Cancel</button>
+                    <button type="submit" class="action-btn primary">
+                        <i class="fas fa-save"></i>
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -1444,6 +1806,8 @@
 
     <script src="admin-script-realtime.js"></script>
     <script src="gallery-functions.js"></script>
+    <script src="config.js"></script>
     <script src="announcement-images.js"></script>
+    <script src="admin-calendar.js"></script>
 </body>
 </html>

@@ -2049,6 +2049,39 @@ html {
     text-align: center;
 }
 
+/* About Section - Subsections Styles */
+.teams-section,
+.program-section,
+.activities-section {
+    margin-top: 60px;
+    margin-bottom: 40px;
+}
+
+.teams-section h2,
+.program-section h2,
+.activities-section h2 {
+    color: #2c5aa0;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+    text-align: center;
+    position: relative;
+}
+
+.teams-section h2::after,
+.program-section h2::after,
+.activities-section h2::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #d32f2f, #b71c1c);
+    border-radius: 2px;
+}
+
 /* Responsive adjustments for announcement images */
 @media (max-width: 768px) {
     .announcement-images.three-images,
@@ -2121,6 +2154,687 @@ html {
     }
 }
 
+/* Calendar Section Styles */
+.calendar-section {
+    background: linear-gradient(135deg, #f8f9fc 0%, #e8ecf7 100%);
+    padding: 80px 0;
+    position: relative;
+}
+
+.calendar-section h2 {
+    text-align: center;
+    color: #2c5aa0;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.calendar-section h2::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, #d32f2f, #b71c1c);
+    border-radius: 2px;
+}
+
+.calendar-intro {
+    text-align: center;
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 50px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.calendar-container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(44, 90, 160, 0.1);
+    overflow: hidden;
+    margin-bottom: 40px;
+}
+
+.calendar-header {
+    background: linear-gradient(135deg, #2c5aa0, #1e3d6f);
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.calendar-header h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.calendar-nav {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.calendar-nav:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0;
+    width: 100%;
+}
+
+.calendar-day-header {
+    background: #f8f9fa;
+    padding: 15px 5px;
+    text-align: center;
+    font-weight: 600;
+    color: #2c5aa0;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 0.9rem;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    border: 1px solid #e9ecef;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 8px 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: 80px;
+}
+
+.calendar-day:hover {
+    background: #f8f9fc;
+}
+
+.calendar-day.other-month {
+    color: #ccc;
+    background: #fafafa;
+}
+
+.calendar-day.today {
+    background: linear-gradient(135deg, #2c5aa0, #1e3d6f);
+    color: white;
+}
+
+.calendar-day.has-events {
+    background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+}
+
+.calendar-day.has-meetings {
+    background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+}
+
+.day-number {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.day-events {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.event-dot {
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    font-size: 0.7rem;
+    padding: 1px 3px;
+    text-align: center;
+    color: white;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.event-dot.meeting {
+    background: #4CAF50;
+}
+
+.event-dot.event {
+    background: #ff9800;
+}
+
+.event-dot.special {
+    background: #f44336;
+}
+
+.upcoming-events {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(44, 90, 160, 0.1);
+}
+
+.upcoming-events h3 {
+    color: #2c5aa0;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.events-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.event-item {
+    background: #f8f9fc;
+    border-radius: 15px;
+    padding: 20px;
+    border-left: 5px solid #2c5aa0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.event-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(44, 90, 160, 0.15);
+}
+
+.event-item.meeting {
+    border-left-color: #4CAF50;
+}
+
+.event-item.special {
+    border-left-color: #f44336;
+}
+
+.event-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.event-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2c5aa0;
+    margin: 0;
+}
+
+.event-type {
+    background: #2c5aa0;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.event-type.meeting {
+    background: #4CAF50;
+}
+
+.event-type.special {
+    background: #f44336;
+}
+
+.event-datetime {
+    color: #666;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.event-description {
+    color: #777;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.event-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.rsvp-btn {
+    background: linear-gradient(135deg, #2c5aa0, #1e3d6f);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.rsvp-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(44, 90, 160, 0.3);
+}
+
+.rsvp-status {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-weight: 500;
+}
+
+.rsvp-status.attending {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+}
+
+.rsvp-status.not-attending {
+    background: rgba(244, 67, 54, 0.1);
+    color: #f44336;
+}
+
+/* RSVP Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.rsvp-modal-content {
+    background: white;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #2c5aa0, #1e3d6f);
+    color: white;
+    padding: 25px 30px;
+    border-radius: 20px 20px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+.event-details {
+    background: #f8f9fc;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.event-info h4 {
+    color: #2c5aa0;
+    font-size: 1.3rem;
+    margin: 0 0 10px 0;
+}
+
+.event-info p {
+    margin: 5px 0;
+    color: #666;
+}
+
+.rsvp-form .form-group {
+    margin-bottom: 20px;
+}
+
+.rsvp-form label {
+    display: block;
+    color: #2c5aa0;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.rsvp-form input,
+.rsvp-form select,
+.rsvp-form textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.rsvp-form input:focus,
+.rsvp-form select:focus,
+.rsvp-form textarea:focus {
+    outline: none;
+    border-color: #2c5aa0;
+}
+
+.rsvp-form small {
+    color: #666;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    display: block;
+}
+
+.radio-group {
+    display: flex;
+    gap: 20px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-weight: normal;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+    white-space: nowrap;
+    min-width: 120px;
+}
+
+.radio-option:hover {
+    background-color: rgba(44, 90, 160, 0.05);
+}
+
+/* Scout Search Styles */
+.scout-search-container {
+    position: relative;
+}
+
+.scout-search-input {
+    position: relative;
+    margin-top: 10px;
+}
+
+.scout-search-input input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.scout-search-input input:focus {
+    outline: none;
+    border-color: #2c5aa0;
+}
+
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid #e9ecef;
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+.search-result-item {
+    padding: 12px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #f8f9fa;
+    transition: background-color 0.3s ease;
+}
+
+.search-result-item:hover {
+    background-color: #f8f9fc;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-name {
+    font-weight: 600;
+    color: #2c5aa0;
+}
+
+.search-result-details {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 2px;
+}
+
+.no-results {
+    padding: 12px 15px;
+    text-align: center;
+    color: #999;
+    font-style: italic;
+}
+
+.radio-option input[type="radio"] {
+    display: none;
+}
+
+.radio-custom {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.radio-option input[type="radio"]:checked + .radio-custom {
+    border-color: #2c5aa0;
+}
+
+.radio-option input[type="radio"]:checked + .radio-custom::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background: #2c5aa0;
+    border-radius: 50%;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+    margin-top: 30px;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #2c5aa0, #1e3d6f);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(44, 90, 160, 0.3);
+}
+
+.btn-secondary {
+    background: #f8f9fc;
+    color: #666;
+    border: 2px solid #e9ecef;
+}
+
+.btn-secondary:hover {
+    background: #e9ecef;
+    color: #333;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .calendar-section {
+        padding: 60px 0;
+    }
+
+    .calendar-section h2 {
+        font-size: 2rem;
+    }
+
+    .calendar-header {
+        padding: 15px;
+    }
+
+    .calendar-header h3 {
+        font-size: 1.2rem;
+    }
+
+    .calendar-day {
+        min-height: 60px;
+        padding: 4px 2px;
+    }
+
+    .day-number {
+        font-size: 0.8rem;
+    }
+
+    .event-dot {
+        height: 3px;
+        font-size: 0.6rem;
+    }
+
+    .upcoming-events {
+        padding: 20px;
+    }
+
+    .event-item {
+        padding: 15px;
+    }
+
+    .event-title {
+        font-size: 1.1rem;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+    .radio-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .calendar-day {
+        min-height: 50px;
+        padding: 2px 1px;
+    }
+
+    .day-number {
+        font-size: 0.7rem;
+    }
+
+    .event-dot {
+        height: 2px;
+        font-size: 0.5rem;
+    }
+
+    .calendar-header {
+        padding: 10px;
+    }
+
+    .calendar-nav {
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
+    }
+
+    .rsvp-modal-content {
+        width: 95%;
+        margin: 10px;
+    }
+
+    .event-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
+
 /* Intersection Observer Animations */
 .fade-in {
     opacity: 0;
@@ -2172,5 +2886,51 @@ html {
 
     .announcement-content {
         font-size: 0.95rem;
+    }
+}
+
+/* Name Input Group for RSVP Form */
+.name-input-group {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+}
+
+.name-field {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.name-field label {
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.name-field input {
+    padding: 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+    background: #fff;
+}
+
+.name-field input:focus {
+    outline: none;
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+.name-field input:invalid {
+    border-color: #ef4444;
+}
+
+@media (max-width: 768px) {
+    .name-input-group {
+        flex-direction: column;
+        gap: 10px;
     }
 }

@@ -1,11 +1,25 @@
 // Announcement Image Management Functions
 // GitHub Configuration for announcements
-const ANNOUNCEMENT_GITHUB_CONFIG = {
-    username: 'baskhairounm',
-    repository: 'SGSA-Pics',
-    token: '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',
-    baseUrl: 'https://api.github.com/repos/baskhairounm/SGSA-Pics/contents'
-};
+//
+// IMPORTANT: The configuration is now loaded from config.js
+// To update the GitHub token, edit the config.js file
+//
+// If the token expires, announcements will still work but images will be shown as local previews only
+//
+function getAnnouncementGitHubConfig() {
+    // Use config from config.js if available, otherwise fall back to defaults
+    if (window.GITHUB_CONFIG) {
+        return window.GITHUB_CONFIG;
+    }
+
+    // Fallback configuration (for development or if config.js is missing)
+    return {
+        username: 'baskhairounm',
+        repository: 'SGSA-Pics',
+        token: '', // No token - will trigger placeholder mode
+        baseUrl: 'https://api.github.com/repos/baskhairounm/SGSA-Pics/contents'
+    };
+}
 
 // Global variables for announcement images
 let selectedAnnouncementImages = [];
@@ -221,6 +235,26 @@ function getImageLayoutClass(count) {
 // Upload announcement images to GitHub
 async function uploadAnnouncementImages(images) {
     console.log('uploadAnnouncementImages called with:', images.length, 'images');
+
+    // Check if GitHub token is available and valid
+    const config = getAnnouncementGitHubConfig();
+    if (!config.token || config.token === '' || config.token === 'your-github-token-here') {
+        console.warn('GitHub token not configured for image uploads');
+
+        // Show user-friendly message
+        if (window.showNotification) {
+            window.showNotification(
+                'Image upload not configured. Images will be shown as previews only. Contact the administrator to set up GitHub integration for permanent image hosting.',
+                'warning'
+            );
+        } else {
+            alert('Image upload not configured. Images will be shown as previews only.');
+        }
+
+        // Return placeholder data for local preview
+        return await generatePlaceholderImageData(images);
+    }
+
     const uploadedImages = [];
 
     for (let i = 0; i < images.length; i++) {
@@ -241,6 +275,40 @@ async function uploadAnnouncementImages(images) {
             });
         } catch (error) {
             console.error('Error uploading announcement image:', imageFile.name, error);
+
+            // Handle authentication errors specifically
+            if (error.message.includes('401') || error.message.includes('Bad credentials')) {
+                console.error('GitHub authentication failed - token may be expired or invalid');
+
+                if (window.showNotification) {
+                    window.showNotification(
+                        'GitHub authentication failed. The access token has expired or is invalid. Images will be shown as local previews only. Contact the administrator to update the GitHub token.',
+                        'error'
+                    );
+                } else {
+                    alert('GitHub authentication failed. Token expired or invalid. Images will be shown as previews only.');
+                }
+
+                // Return placeholder data instead of throwing error
+                console.log('Falling back to placeholder images due to authentication failure');
+                return await generatePlaceholderImageData(images);
+            }
+
+            // Handle other GitHub API errors (rate limits, network issues, etc.)
+            if (error.message.includes('403')) {
+                console.error('GitHub API rate limit or forbidden error');
+
+                if (window.showNotification) {
+                    window.showNotification(
+                        'GitHub API access denied. This may be due to rate limits or repository permissions. Images will be shown as local previews.',
+                        'warning'
+                    );
+                }
+
+                // Return placeholder data for rate limit issues
+                return await generatePlaceholderImageData(images);
+            }
+
             throw new Error(`Failed to upload image: ${imageFile.name} - ${error.message}`);
         }
     }
@@ -255,6 +323,44 @@ function generateAnnouncementFilename(originalName) {
     const extension = originalName.split('.').pop();
     const cleanName = originalName.replace(/[^a-zA-Z0-9]/g, '-');
     return `announcements/${timestamp}-${cleanName}.${extension}`;
+}
+
+// Generate placeholder image data for local preview when GitHub is not available
+async function generatePlaceholderImageData(images) {
+    console.log('Generating placeholder image data for', images.length, 'images');
+
+    const placeholderImages = [];
+
+    for (let i = 0; i < images.length; i++) {
+        const imageFile = images[i];
+
+        try {
+            // Create a local blob URL for preview
+            const blobUrl = URL.createObjectURL(imageFile);
+
+            placeholderImages.push({
+                url: blobUrl,
+                filename: `local-preview-${i}-${imageFile.name}`,
+                uploadDate: Date.now(),
+                isPlaceholder: true
+            });
+        } catch (error) {
+            console.error('Error creating placeholder for image:', imageFile.name, error);
+
+            // Create a basic placeholder image
+            const placeholderUrl = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI0NSUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzY2NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIFByZXZpZXc8L3RleHQ+PHRleHQgeD0iNTAlIiB5PSI2NSUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPihHaXRIdWIgbm90IGNvbmZpZ3VyZWQpPC90ZXh0Pjwvc3ZnPg==';
+
+            placeholderImages.push({
+                url: placeholderUrl,
+                filename: `placeholder-${i}-${imageFile.name}`,
+                uploadDate: Date.now(),
+                isPlaceholder: true
+            });
+        }
+    }
+
+    console.log('Generated placeholder images:', placeholderImages);
+    return placeholderImages;
 }
 
 // File to Base64 conversion for announcements
@@ -279,10 +385,11 @@ async function uploadAnnouncementToGitHub(imageFile, filename) {
         const base64Data = await announcementFileToBase64(imageFile);
         const base64Content = base64Data.split(',')[1]; // Remove data:image prefix
 
-        const response = await fetch(`${ANNOUNCEMENT_GITHUB_CONFIG.baseUrl}/${filename}`, {
+        const config = getAnnouncementGitHubConfig();
+        const response = await fetch(`${config.baseUrl}/${filename}`, {
             method: 'PUT',
             headers: {
-                'Authorization': `token ${ANNOUNCEMENT_GITHUB_CONFIG.token}`,
+                'Authorization': `token ${config.token}`,
                 'Content-Type': 'application/json',
                 'Accept': 'application/vnd.github.v3+json'
             },
@@ -300,7 +407,7 @@ async function uploadAnnouncementToGitHub(imageFile, filename) {
         const result = await response.json();
 
         // Use the GitHub blob URL with ?raw=true for immediate access
-        const workingUrl = `https://github.com/${ANNOUNCEMENT_GITHUB_CONFIG.username}/${ANNOUNCEMENT_GITHUB_CONFIG.repository}/blob/main/${filename}?raw=true`;
+        const workingUrl = `https://github.com/${config.username}/${config.repository}/blob/main/${filename}?raw=true`;
 
         console.log('Announcement image upload successful:', {
             filename,
@@ -321,19 +428,20 @@ async function ensureAnnouncementDirectoryExists(directory) {
         const gitkeepPath = `${directory}/.gitkeep`;
 
         // Check if directory already has files
-        const checkResponse = await fetch(`${ANNOUNCEMENT_GITHUB_CONFIG.baseUrl}/${directory}`, {
+        const config = getAnnouncementGitHubConfig();
+        const checkResponse = await fetch(`${config.baseUrl}/${directory}`, {
             headers: {
-                'Authorization': `token ${ANNOUNCEMENT_GITHUB_CONFIG.token}`,
+                'Authorization': `token ${config.token}`,
                 'Accept': 'application/vnd.github.v3+json'
             }
         });
 
         // If directory doesn't exist (404), create it
         if (checkResponse.status === 404) {
-            const createResponse = await fetch(`${ANNOUNCEMENT_GITHUB_CONFIG.baseUrl}/${gitkeepPath}`, {
+            const createResponse = await fetch(`${config.baseUrl}/${gitkeepPath}`, {
                 method: 'PUT',
                 headers: {
-                    'Authorization': `token ${ANNOUNCEMENT_GITHUB_CONFIG.token}`,
+                    'Authorization': `token ${config.token}`,
                     'Content-Type': 'application/json',
                     'Accept': 'application/vnd.github.v3+json'
                 },
@@ -510,16 +618,17 @@ function handleAnnouncementImageError(img, originalUrl) {
     console.error('Announcement image failed to load:', originalUrl);
 
     // Try alternative URLs
+    const config = getAnnouncementGitHubConfig();
     const filename = originalUrl.split('/').slice(-2).join('/'); // Get announcements/filename
     const alternativeUrls = [
         // Primary working format with ?raw=true
-        `https://github.com/${ANNOUNCEMENT_GITHUB_CONFIG.username}/${ANNOUNCEMENT_GITHUB_CONFIG.repository}/blob/main/${filename}?raw=true`,
+        `https://github.com/${config.username}/${config.repository}/blob/main/${filename}?raw=true`,
         // Standard raw GitHub URLs
-        `https://raw.githubusercontent.com/${ANNOUNCEMENT_GITHUB_CONFIG.username}/${ANNOUNCEMENT_GITHUB_CONFIG.repository}/main/${filename}`,
-        `https://github.com/${ANNOUNCEMENT_GITHUB_CONFIG.username}/${ANNOUNCEMENT_GITHUB_CONFIG.repository}/raw/main/${filename}`,
+        `https://raw.githubusercontent.com/${config.username}/${config.repository}/main/${filename}`,
+        `https://github.com/${config.username}/${config.repository}/raw/main/${filename}`,
         // Try master branch alternatives
-        `https://github.com/${ANNOUNCEMENT_GITHUB_CONFIG.username}/${ANNOUNCEMENT_GITHUB_CONFIG.repository}/blob/master/${filename}?raw=true`,
-        `https://raw.githubusercontent.com/${ANNOUNCEMENT_GITHUB_CONFIG.username}/${ANNOUNCEMENT_GITHUB_CONFIG.repository}/master/${filename}`
+        `https://github.com/${config.username}/${config.repository}/blob/master/${filename}?raw=true`,
+        `https://raw.githubusercontent.com/${config.username}/${config.repository}/master/${filename}`
     ];
 
     // Try each alternative URL
