@@ -60,6 +60,10 @@
                     <i class="fas fa-users"></i>
                     <span>Scout Roster</span>
                 </li>
+                <li class="menu-item" data-section="troops">
+                    <i class="fas fa-flag"></i>
+                    <span>Troop Management</span>
+                </li>
                 <li class="menu-item" data-section="attendance">
                     <i class="fas fa-clipboard-check"></i>
                     <span>Attendance</span>
@@ -270,6 +274,58 @@
 
                 <div class="scouts-grid" id="scoutsGrid">
                     <!-- Scouts will be populated here -->
+                </div>
+            </section>
+
+            <!-- Troop Management Section -->
+            <section id="troopsSection" class="content-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <h2>Troop Management</h2>
+                        <p>Organize teams into troops with designated leaders</p>
+                    </div>
+                    <button class="add-btn" onclick="showAddTroopModal()">
+                        <i class="fas fa-plus"></i>
+                        Create New Troop
+                    </button>
+                </div>
+
+                <!-- Team Selector -->
+                <div class="troops-controls">
+                    <div class="team-selector">
+                        <label for="troopTeamFilter">Select Team:</label>
+                        <select id="troopTeamFilter" class="team-select" onchange="loadTroopsForTeam()">
+                            <option value="cubs">Cubs & Brownies (Grades 3-6)</option>
+                            <option value="scouts" selected>Scouts (Grades 7-10)</option>
+                            <option value="rovers">Rovers (Grades 11+)</option>
+                        </select>
+                    </div>
+                    <div class="troop-stats">
+                        <span class="stat-item">
+                            <strong id="totalTroopsCount">0</strong> troops
+                        </span>
+                        <span class="stat-item">
+                            <strong id="unassignedScoutsCount">0</strong> unassigned scouts
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Troops Grid -->
+                <div class="troops-container">
+                    <div class="troops-grid" id="troopsGrid">
+                        <!-- Troops will be populated here -->
+                    </div>
+
+                    <!-- Unassigned Scouts Panel -->
+                    <div class="unassigned-panel">
+                        <div class="panel-header">
+                            <h3><i class="fas fa-user-plus"></i> Unassigned Scouts</h3>
+                            <span class="scout-count" id="unassignedCount">0</span>
+                        </div>
+                        <div class="unassigned-scouts" id="unassignedScouts">
+                            <!-- Unassigned scouts will be listed here -->
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -1796,6 +1852,206 @@
         </div>
     </div>
 
+    <!-- Add Troop Modal -->
+    <div id="addTroopModal" class="modal" style="display: none;">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Create New Troop</h3>
+                <button class="close-btn" onclick="closeModal('addTroopModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addTroopForm" class="troop-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Team *</label>
+                        <select name="team" id="troopTeamSelect" required>
+                            <option value="">Select Team</option>
+                            <option value="cubs">Cubs & Brownies (Grades 3-6)</option>
+                            <option value="scouts">Scouts (Grades 7-10)</option>
+                            <option value="rovers">Rovers (Grades 11+)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Troop Name *</label>
+                        <input type="text" name="troopName" required maxlength="50" placeholder="e.g., Red Hawks, Blue Sharks">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Troop Leader</label>
+                        <select name="troopLeader" id="troopLeaderSelect">
+                            <option value="">Select Leader (Optional)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Assistant Leader</label>
+                        <select name="assistantLeader" id="assistantLeaderSelect">
+                            <option value="">Select Assistant (Optional)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Troop Color/Theme</label>
+                    <div class="color-selector">
+                        <div class="color-option" data-color="red" style="background: #ef4444"></div>
+                        <div class="color-option" data-color="blue" style="background: #3b82f6"></div>
+                        <div class="color-option" data-color="green" style="background: #10b981"></div>
+                        <div class="color-option" data-color="orange" style="background: #f97316"></div>
+                        <div class="color-option" data-color="purple" style="background: #8b5cf6"></div>
+                        <div class="color-option" data-color="yellow" style="background: #eab308"></div>
+                        <div class="color-option" data-color="pink" style="background: #ec4899"></div>
+                        <div class="color-option" data-color="teal" style="background: #14b8a6"></div>
+                    </div>
+                    <input type="hidden" name="troopColor" id="selectedColor" value="blue">
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description" rows="3" maxlength="200" placeholder="Brief description of the troop's characteristics or focus"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="action-btn secondary" onclick="closeModal('addTroopModal')">Cancel</button>
+                    <button type="submit" class="action-btn primary">
+                        <i class="fas fa-plus"></i>
+                        Create Troop
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Troop Modal -->
+    <div id="editTroopModal" class="modal" style="display: none;">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Edit Troop</h3>
+                <button class="close-btn" onclick="closeModal('editTroopModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="editTroopForm" class="troop-form">
+                <input type="hidden" name="troopId" id="editTroopId">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Team *</label>
+                        <select name="team" id="editTroopTeamSelect" required disabled>
+                            <option value="cubs">Cubs & Brownies (Grades 3-6)</option>
+                            <option value="scouts">Scouts (Grades 7-10)</option>
+                            <option value="rovers">Rovers (Grades 11+)</option>
+                        </select>
+                        <small>Team cannot be changed after creation</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Troop Name *</label>
+                        <input type="text" name="troopName" id="editTroopName" required maxlength="50">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Troop Leader</label>
+                        <select name="troopLeader" id="editTroopLeaderSelect">
+                            <option value="">Select Leader (Optional)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Assistant Leader</label>
+                        <select name="assistantLeader" id="editAssistantLeaderSelect">
+                            <option value="">Select Assistant (Optional)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Troop Color/Theme</label>
+                    <div class="color-selector">
+                        <div class="color-option" data-color="red" style="background: #ef4444"></div>
+                        <div class="color-option" data-color="blue" style="background: #3b82f6"></div>
+                        <div class="color-option" data-color="green" style="background: #10b981"></div>
+                        <div class="color-option" data-color="orange" style="background: #f97316"></div>
+                        <div class="color-option" data-color="purple" style="background: #8b5cf6"></div>
+                        <div class="color-option" data-color="yellow" style="background: #eab308"></div>
+                        <div class="color-option" data-color="pink" style="background: #ec4899"></div>
+                        <div class="color-option" data-color="teal" style="background: #14b8a6"></div>
+                    </div>
+                    <input type="hidden" name="troopColor" id="editSelectedColor">
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description" id="editTroopDescription" rows="3" maxlength="200"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="action-btn secondary" onclick="closeModal('editTroopModal')">Cancel</button>
+                    <button type="submit" class="action-btn primary">
+                        <i class="fas fa-save"></i>
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Assign Scouts Modal -->
+    <div id="assignScoutsModal" class="modal" style="display: none;">
+        <div class="modal-content extra-large">
+            <div class="modal-header">
+                <h3 id="assignModalTitle">Assign Scouts to Troop</h3>
+                <button class="close-btn" onclick="closeModal('assignScoutsModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="assign-scouts-content">
+                <div class="assign-controls">
+                    <div class="search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="scoutAssignSearch" placeholder="Search scouts..." onkeyup="filterAssignableScouts()">
+                    </div>
+                    <div class="assign-actions">
+                        <button class="action-btn sm secondary" onclick="selectAllScouts()">
+                            <i class="fas fa-check-double"></i>
+                            Select All
+                        </button>
+                        <button class="action-btn sm secondary" onclick="deselectAllScouts()">
+                            <i class="fas fa-times"></i>
+                            Deselect All
+                        </button>
+                    </div>
+                </div>
+
+                <div class="assign-grid">
+                    <div class="available-scouts">
+                        <h4><i class="fas fa-users"></i> Available Scouts</h4>
+                        <div class="scouts-list" id="availableScoutsList">
+                            <!-- Available scouts will be listed here -->
+                        </div>
+                    </div>
+
+                    <div class="current-members">
+                        <h4><i class="fas fa-flag"></i> Current Troop Members</h4>
+                        <div class="scouts-list" id="currentMembersList">
+                            <!-- Current troop members will be listed here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="assign-actions-bottom">
+                    <button type="button" class="action-btn secondary" onclick="closeModal('assignScoutsModal')">Cancel</button>
+                    <button type="button" class="action-btn primary" id="saveAssignmentsBtn" onclick="saveScoutAssignments()">
+                        <i class="fas fa-save"></i>
+                        Save Assignments
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -1809,5 +2065,6 @@
     <script src="config.js"></script>
     <script src="announcement-images.js"></script>
     <script src="admin-calendar.js"></script>
+    <script src="admin-troops.js"></script>
 </body>
 </html>

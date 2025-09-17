@@ -15,6 +15,9 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const database = firebase.database();
 
+// Make database available globally for other modules
+window.database = database;
+
 // Global variables
 let currentUser = null;
 let scouts = [];
@@ -3017,5 +3020,13 @@ window.showSection = function(sectionName) {
 
     if (sectionName === 'dashboard') {
         updateDashboardStats();
+    } else if (sectionName === 'troops') {
+        // Initialize troop management when troops section is shown
+        if (window.loadTroopsForTeam && window.loadScoutsData) {
+            setTimeout(() => {
+                window.loadTroopsForTeam();
+                window.loadScoutsData();
+            }, 100);
+        }
     }
 };

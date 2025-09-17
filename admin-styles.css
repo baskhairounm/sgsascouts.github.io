@@ -4626,3 +4626,438 @@ body {
     background: #0ea5e9;
     color: white;
 }
+
+
+/* Troop Management Styles */
+.troops-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+}
+
+.troop-stats {
+    display: flex;
+    gap: 20px;
+}
+
+.troop-stats .stat-item {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.troop-stats .stat-item strong {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.troops-container {
+    display: flex;
+    gap: 20px;
+    min-height: 600px;
+}
+
+.troops-grid {
+    flex: 2;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+    align-content: start;
+}
+
+.troop-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid #3b82f6;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.troop-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.troop-card.red { border-left-color: #ef4444; }
+.troop-card.blue { border-left-color: #3b82f6; }
+.troop-card.green { border-left-color: #10b981; }
+.troop-card.orange { border-left-color: #f97316; }
+.troop-card.purple { border-left-color: #8b5cf6; }
+.troop-card.yellow { border-left-color: #eab308; }
+.troop-card.pink { border-left-color: #ec4899; }
+.troop-card.teal { border-left-color: #14b8a6; }
+
+.troop-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.troop-info h3 {
+    color: #2c3e50;
+    margin-bottom: 5px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.troop-team {
+    background: #e9ecef;
+    color: #495057;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.troop-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.troop-actions .action-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    min-width: auto;
+}
+
+.troop-leadership {
+    margin-bottom: 15px;
+}
+
+.leadership-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.leadership-item i {
+    width: 16px;
+    color: #6c757d;
+}
+
+.leadership-item .role {
+    font-weight: 500;
+    color: #495057;
+}
+
+.leadership-item .name {
+    color: #2c3e50;
+}
+
+.troop-members {
+    border-top: 1px solid #e9ecef;
+    padding-top: 15px;
+}
+
+.members-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.members-count {
+    background: #e3f2fd;
+    color: #1976d2;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.members-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.member-tag {
+    background: #f8f9fa;
+    color: #495057;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    border: 1px solid #e9ecef;
+}
+
+.troop-description {
+    color: #6c757d;
+    font-size: 13px;
+    font-style: italic;
+    margin-top: 10px;
+}
+
+/* Unassigned Scouts Panel */
+.unassigned-panel {
+    flex: 1;
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.panel-header h3 {
+    color: #2c3e50;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.scout-count {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.unassigned-scouts {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.unassigned-scout {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s ease;
+}
+
+.unassigned-scout:hover {
+    background: #e9ecef;
+    border-color: #dee2e6;
+}
+
+.scout-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.scout-name {
+    font-weight: 500;
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.scout-grade {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.assign-btn {
+    padding: 4px 8px;
+    font-size: 11px;
+    background: #0ea5e9;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.assign-btn:hover {
+    background: #0284c7;
+}
+
+/* Color Selector */
+.color-selector {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.color-option {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+}
+
+.color-option.selected {
+    border-color: #2c3e50;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #2c3e50;
+}
+
+/* Assign Scouts Modal Styles */
+.assign-scouts-content {
+    padding: 0;
+}
+
+.assign-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #e9ecef;
+    background: #f8f9fa;
+}
+
+.assign-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.assign-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 20px;
+    min-height: 400px;
+}
+
+.available-scouts,
+.current-members {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.available-scouts h4,
+.current-members h4 {
+    background: #f8f9fa;
+    padding: 15px;
+    margin: 0;
+    color: #2c3e50;
+    font-size: 14px;
+    font-weight: 600;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.scouts-list {
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.scout-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid #f1f3f4;
+    transition: background 0.2s ease;
+}
+
+.scout-item:last-child {
+    border-bottom: none;
+}
+
+.scout-item:hover {
+    background: #f8f9fa;
+}
+
+.scout-item.selected {
+    background: #e3f2fd;
+    border-color: #1976d2;
+}
+
+.scout-item input[type="checkbox"] {
+    margin-left: 10px;
+}
+
+.assign-actions-bottom {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 20px;
+    border-top: 1px solid #e9ecef;
+    background: #f8f9fa;
+}
+
+/* Empty States */
+.empty-troops {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+}
+
+.empty-troops i {
+    font-size: 48px;
+    margin-bottom: 20px;
+    color: #dee2e6;
+}
+
+.empty-troops h3 {
+    color: #495057;
+    margin-bottom: 10px;
+}
+
+.empty-unassigned {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6c757d;
+}
+
+.empty-unassigned i {
+    font-size: 32px;
+    margin-bottom: 15px;
+    color: #dee2e6;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .troops-container {
+        flex-direction: column;
+    }
+    
+    .troops-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+    
+    .assign-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .troops-controls {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+    
+    .troop-stats {
+        justify-content: center;
+    }
+    
+    .troops-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .troop-card {
+        padding: 15px;
+    }
+    
+    .color-selector {
+        justify-content: center;
+    }
+}
