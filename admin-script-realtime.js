@@ -2845,7 +2845,7 @@ function populateProgramYearsForTeam(team) {
 }
 
 // Enhanced scout validation for team assignment
-function validateScoutData(scouts) {
+function validateScoutsArray(scouts) {
     const validScouts = [];
     const errors = [];
 
