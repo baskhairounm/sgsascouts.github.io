@@ -108,6 +108,7 @@ async function loadTroopsForTeam() {
 
         console.log(`Loaded ${currentTroops.length} troops for team ${selectedTeam}`);
         displayTroops();
+        displayUnassignedScouts();
         updateTroopStats();
     } catch (error) {
         console.error('Error loading troops:', error);
