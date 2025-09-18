@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>SGSA Scouts - Sea Scouts Program</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
@@ -16,6 +16,11 @@
                     <img src="logo.jpeg" alt="SGSA Scouts Logo" class="logo">
                     <h1>SGSA Scouts</h1>
                 </div>
+                <button class="mobile-menu-toggle" aria-label="Toggle navigation menu">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
                 <ul class="nav-menu">
                     <li><a href="#home">Home</a></li>
                     <li><a href="#announcements-feed">Announcements</a></li>
@@ -719,6 +724,7 @@
             updateMeetingInfo();
             loadAnnouncementsFeed();
             loadPhotoGallery();
+            initializeMobileMenu();
 
             // Update countdown every minute
             setInterval(updateCountdown, 60000);
@@ -729,6 +735,57 @@
             // Update announcements every 5 minutes
             setInterval(loadAnnouncementsFeed, 300000);
         });
+
+        // Mobile Menu Functions
+        function initializeMobileMenu() {
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            const navMenu = document.querySelector('.nav-menu');
+            const navLinks = document.querySelectorAll('.nav-menu a');
+
+            if (mobileToggle && navMenu) {
+                mobileToggle.addEventListener('click', function() {
+                    toggleMobileMenu();
+                });
+
+                // Close menu when clicking on links
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        closeMobileMenu();
+                    });
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!event.target.closest('.nav-container')) {
+                        closeMobileMenu();
+                    }
+                });
+            }
+        }
+
+        function toggleMobileMenu() {
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            const navMenu = document.querySelector('.nav-menu');
+
+            mobileToggle.classList.toggle('active');
+            navMenu.classList.toggle('active');
+
+            // Prevent body scroll when menu is open
+            if (navMenu.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
+
+        function closeMobileMenu() {
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            const navMenu = document.querySelector('.nav-menu');
+
+            mobileToggle.classList.remove('active');
+            navMenu.classList.remove('active');
+            document.body.style.overflow = '';
+        }
 
         // Firebase Configuration for announcements feed
         const firebaseConfig = {
