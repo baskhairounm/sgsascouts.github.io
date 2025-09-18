@@ -130,11 +130,7 @@ function setupEventListeners() {
         });
     });
     
-    // Add scout form
-    const addScoutForm = document.getElementById('addScoutForm');
-    if (addScoutForm) {
-        addScoutForm.addEventListener('submit', handleAddScout);
-    }
+    // Add scout form - handled by addScout function later in initialization
 
     // Edit scout form
     const editScoutForm = document.getElementById('editScoutForm');
@@ -2296,11 +2292,26 @@ function validateScoutData(scout) {
     if (!scout.parentPhone) scout.errors.push('Missing parent phone');
 
     // Grade validation
-    const grade = parseInt(scout.grade);
-    if (!grade || (grade !== 7 && grade !== 8)) {
-        scout.errors.push('Grade must be 7 or 8');
+    const gradeInput = scout.grade?.toString().toLowerCase().trim();
+
+    if (!gradeInput) {
+        scout.errors.push('Grade is required');
     } else {
-        scout.grade = grade;
+        // Handle post-secondary entries
+        const postSecondaryTerms = ['post-secondary', 'post secondary', 'postsecondary', 'college', 'university', 'adult'];
+        const isPostSecondary = postSecondaryTerms.some(term => gradeInput.includes(term));
+
+        if (isPostSecondary) {
+            scout.grade = 'Post-Secondary';
+        } else {
+            // Handle numeric grades
+            const grade = parseInt(gradeInput);
+            if (grade && grade >= 3 && grade <= 12) {
+                scout.grade = grade;
+            } else {
+                scout.errors.push('Grade must be 3-12 or Post-Secondary');
+            }
+        }
     }
 
     // Phone validation
