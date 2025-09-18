@@ -1474,12 +1474,12 @@ footer {
         margin: 0 auto;
         max-width: 200px;
     }
-    
+
     /* Meeting Tracker Mobile Styles */
     .meeting-tracker {
         padding: 80px 0;
     }
-    
+
     .meeting-tracker h2 {
         font-size: 2.5rem;
         margin-bottom: 40px;
@@ -1597,7 +1597,7 @@ footer {
     .hero-title {
         font-size: 2rem;
     }
-    
+
     .teams, .about, .program, .activities, .join {
         padding: 80px 0;
     }
@@ -1837,6 +1837,7 @@ html {
     overflow: hidden;
     cursor: pointer;
 }
+
 
 .announcement-images.single-image {
     max-width: 100%;
@@ -2109,6 +2110,7 @@ html {
         height: 250px;
     }
 
+
     .gallery-nav {
         width: 40px;
         height: 40px;
@@ -2148,6 +2150,7 @@ html {
     .announcement-images.single-image .announcement-image {
         height: 200px;
     }
+
 
     .gallery-nav {
         display: none;

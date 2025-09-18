@@ -147,17 +147,6 @@
                         </div>
                     </div>
 
-                    <div class="tracker-card current-week">
-                        <div class="tracker-icon">
-                            <i class="fas fa-calendar-week"></i>
-                        </div>
-                        <div class="tracker-content">
-                            <h3>Current Program Week</h3>
-                            <p class="week-number" id="currentWeek">Week 0</p>
-                            <p class="program-progress" id="programProgress">Program hasn't started</p>
-                        </div>
-                    </div>
-
                     <div class="tracker-card next-theme">
                         <div class="tracker-icon">
                             <i class="fas fa-compass"></i>
@@ -644,28 +633,6 @@
             );
         }
 
-        // Calculate current program week
-        function getCurrentWeek() {
-            const now = new Date();
-            const programStart = window.MEETING_CONFIG.programStart;
-            
-            if (now < programStart) {
-                return { week: 0, status: "Program hasn't started yet" };
-            }
-            
-            if (now > window.MEETING_CONFIG.programEnd) {
-                return { week: 0, status: "Program has ended for the year" };
-            }
-            
-            // Calculate weeks since program start
-            const timeDiff = now - programStart;
-            const weeksDiff = Math.floor(timeDiff / (7 * 24 * 60 * 60 * 1000)) + 1;
-            
-            return { 
-                week: weeksDiff, 
-                status: `Week ${weeksDiff} of the program year` 
-            };
-        }
 
         // Get current month's theme
         function getCurrentTheme() {
@@ -722,33 +689,27 @@
         // Update all meeting information
         function updateMeetingInfo() {
             const nextMeeting = getNextMeetingDate();
-            const currentWeek = getCurrentWeek();
             const currentTheme = getCurrentTheme();
-            
+
             // Update next meeting date
             if (nextMeeting) {
-                const options = { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
+                const options = {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
                 };
-                document.getElementById('nextMeetingDate').textContent = 
+                document.getElementById('nextMeetingDate').textContent =
                     nextMeeting.toLocaleDateString('en-US', options);
             } else {
-                document.getElementById('nextMeetingDate').textContent = 
+                document.getElementById('nextMeetingDate').textContent =
                     'No meetings scheduled';
             }
-            
-            // Update current week
-            document.getElementById('currentWeek').textContent = 
-                currentWeek.week > 0 ? `Week ${currentWeek.week}` : 'Program Break';
-            document.getElementById('programProgress').textContent = currentWeek.status;
-            
+
             // Update current theme
             document.getElementById('currentTheme').textContent = currentTheme.title;
             document.getElementById('themeDescription').textContent = currentTheme.description;
-            
+
             // Update countdown
             updateCountdown();
         }

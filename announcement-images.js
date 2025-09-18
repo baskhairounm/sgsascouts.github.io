@@ -527,7 +527,7 @@ function displayAnnouncementImages(images, container) {
     container.appendChild(imagesContainer);
 }
 
-// Open announcement image modal (similar to gallery)
+// Open announcement image modal with enhanced navigation and swipe support
 function openAnnouncementImageModal(images, startIndex = 0) {
     // Use working URL if available, otherwise use original URL
     const currentImage = images[startIndex];
@@ -542,7 +542,7 @@ function openAnnouncementImageModal(images, startIndex = 0) {
             <button class="modal-close" onclick="closeAnnouncementImageModal()">
                 <i class="fas fa-times"></i>
             </button>
-            <div class="image-gallery-viewer">
+            <div class="image-gallery-viewer" id="announcementImageViewer">
                 <button class="gallery-nav gallery-prev" onclick="prevAnnouncementImage()" style="display: ${images.length > 1 ? 'flex' : 'none'}">
                     <i class="fas fa-chevron-left"></i>
                 </button>
@@ -553,7 +553,7 @@ function openAnnouncementImageModal(images, startIndex = 0) {
                 </button>
             </div>
             <div class="image-counter" style="display: ${images.length > 1 ? 'block' : 'none'}">
-                ${startIndex + 1} / ${images.length}
+                <span id="announcementImageCounter">${startIndex + 1} / ${images.length}</span>
             </div>
         </div>
     `;
@@ -564,12 +564,22 @@ function openAnnouncementImageModal(images, startIndex = 0) {
 
     document.body.appendChild(modal);
     document.body.style.overflow = 'hidden';
+
+    // Add swipe gesture support
+    if (images.length > 1) {
+        setupAnnouncementSwipeGestures(modal);
+    }
+
+    // Add keyboard navigation
+    setupAnnouncementKeyboardNavigation(modal);
 }
 
 // Close announcement image modal
 function closeAnnouncementImageModal() {
     const modal = document.querySelector('.image-modal');
     if (modal) {
+        // Remove event listeners before removing modal
+        document.removeEventListener('keydown', modal.keydownHandler);
         modal.remove();
         document.body.style.overflow = '';
     }
@@ -581,17 +591,7 @@ function prevAnnouncementImage() {
     if (!modal || !modal.announcementImages) return;
 
     modal.currentIndex = modal.currentIndex > 0 ? modal.currentIndex - 1 : modal.announcementImages.length - 1;
-
-    const img = document.getElementById('announcementModalImage');
-    const counter = document.querySelector('.image-counter');
-    const currentImage = modal.announcementImages[modal.currentIndex];
-
-    // Use working URL if available, otherwise use original URL
-    const imageUrl = currentImage.workingUrl || currentImage.url;
-    img.src = imageUrl;
-    img.onerror = () => handleAnnouncementImageError(img, currentImage.url);
-
-    counter.textContent = `${modal.currentIndex + 1} / ${modal.announcementImages.length}`;
+    updateAnnouncementModalImage(modal);
 }
 
 // Navigate to next image
@@ -600,9 +600,13 @@ function nextAnnouncementImage() {
     if (!modal || !modal.announcementImages) return;
 
     modal.currentIndex = modal.currentIndex < modal.announcementImages.length - 1 ? modal.currentIndex + 1 : 0;
+    updateAnnouncementModalImage(modal);
+}
 
+// Update the image and counter in the modal
+function updateAnnouncementModalImage(modal) {
     const img = document.getElementById('announcementModalImage');
-    const counter = document.querySelector('.image-counter');
+    const counter = document.getElementById('announcementImageCounter');
     const currentImage = modal.announcementImages[modal.currentIndex];
 
     // Use working URL if available, otherwise use original URL
@@ -610,7 +614,124 @@ function nextAnnouncementImage() {
     img.src = imageUrl;
     img.onerror = () => handleAnnouncementImageError(img, currentImage.url);
 
-    counter.textContent = `${modal.currentIndex + 1} / ${modal.announcementImages.length}`;
+    if (counter) {
+        counter.textContent = `${modal.currentIndex + 1} / ${modal.announcementImages.length}`;
+    }
+}
+
+// Setup swipe gestures for announcement modal
+function setupAnnouncementSwipeGestures(modal) {
+    const imageViewer = modal.querySelector('#announcementImageViewer');
+    if (!imageViewer) return;
+
+    let startX = 0;
+    let startY = 0;
+    let startTime = 0;
+    const minSwipeDistance = 50;
+    const maxSwipeTime = 300;
+
+    // Touch events for mobile
+    imageViewer.addEventListener('touchstart', (e) => {
+        const touch = e.touches[0];
+        startX = touch.clientX;
+        startY = touch.clientY;
+        startTime = Date.now();
+    }, { passive: true });
+
+    imageViewer.addEventListener('touchend', (e) => {
+        if (!e.changedTouches.length) return;
+
+        const touch = e.changedTouches[0];
+        const endX = touch.clientX;
+        const endY = touch.clientY;
+        const endTime = Date.now();
+
+        const deltaX = endX - startX;
+        const deltaY = endY - startY;
+        const deltaTime = endTime - startTime;
+
+        // Check if it's a valid swipe (horizontal, fast enough, long enough)
+        if (Math.abs(deltaX) > Math.abs(deltaY) &&
+            Math.abs(deltaX) > minSwipeDistance &&
+            deltaTime < maxSwipeTime) {
+
+            if (deltaX > 0) {
+                // Swipe right - previous image
+                prevAnnouncementImage();
+            } else {
+                // Swipe left - next image
+                nextAnnouncementImage();
+            }
+        }
+    }, { passive: true });
+
+    // Mouse events for desktop
+    let isMouseDown = false;
+
+    imageViewer.addEventListener('mousedown', (e) => {
+        startX = e.clientX;
+        startY = e.clientY;
+        startTime = Date.now();
+        isMouseDown = true;
+    });
+
+    imageViewer.addEventListener('mouseup', (e) => {
+        if (!isMouseDown) return;
+        isMouseDown = false;
+
+        const endX = e.clientX;
+        const endY = e.clientY;
+        const endTime = Date.now();
+
+        const deltaX = endX - startX;
+        const deltaY = endY - startY;
+        const deltaTime = endTime - startTime;
+
+        // Check if it's a valid swipe (horizontal, fast enough, long enough)
+        if (Math.abs(deltaX) > Math.abs(deltaY) &&
+            Math.abs(deltaX) > minSwipeDistance &&
+            deltaTime < maxSwipeTime) {
+
+            if (deltaX > 0) {
+                // Swipe right - previous image
+                prevAnnouncementImage();
+            } else {
+                // Swipe left - next image
+                nextAnnouncementImage();
+            }
+        }
+    });
+
+    imageViewer.addEventListener('mouseleave', () => {
+        isMouseDown = false;
+    });
+}
+
+// Setup keyboard navigation for announcement modal
+function setupAnnouncementKeyboardNavigation(modal) {
+    const keydownHandler = (e) => {
+        // Only handle if this modal is open
+        if (!document.querySelector('.image-modal')) return;
+
+        switch(e.key) {
+            case 'ArrowLeft':
+                e.preventDefault();
+                prevAnnouncementImage();
+                break;
+            case 'ArrowRight':
+                e.preventDefault();
+                nextAnnouncementImage();
+                break;
+            case 'Escape':
+                e.preventDefault();
+                closeAnnouncementImageModal();
+                break;
+        }
+    };
+
+    // Store the handler on the modal so we can remove it later
+    modal.keydownHandler = keydownHandler;
+    document.addEventListener('keydown', keydownHandler);
 }
 
 // Handle announcement image loading errors
@@ -656,6 +777,7 @@ function handleAnnouncementImageError(img, originalUrl) {
     // Start trying alternatives after a brief delay
     setTimeout(tryNextUrl, 1000);
 }
+
 
 // Expose functions and variables to global window object
 window.getSelectedAnnouncementImages = () => selectedAnnouncementImages;
